@@ -1,6 +1,18 @@
+bin
+gen
+target
+.classpath
+.settings
+.classpath
+.project
+*.keystore
+*.swp
+*.orig
+*.com
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
