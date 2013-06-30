@@ -49,8 +49,6 @@ public class Scanner extends ScannerTemplate{
 					log.info(String.format("Cannot cast mapping package path:(%s) to file URL.", pathString));
 				}
 			}	
-		} else {
-			
 		}
 		
 		String className = null;
