@@ -1,9 +1,11 @@
 package org.centaurus.client;
 
 import java.net.UnknownHostException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.centaurus.configuration.CentaurusConfig;
+import org.centaurus.dql.QueryData;
 import org.centaurus.exceptions.CentaurusException;
 
 import com.mongodb.DB;
@@ -17,14 +19,14 @@ import com.mongodb.ServerAddress;
  * @author Vladislav Socolov
  */
 public class MongoDBClient implements DBClient {
-	private static final long serialVersionUID = 2016785660109383037L;
 	private static Logger log = Logger.getLogger(MongoDBClient.class);
 	
 	private MongoClient mongoClient;
 	private DB mongoDB;
 	private Mapper mapper;
 	
-	public MongoDBClient() {
+	public MongoDBClient(Mapper mapper) {
+		this.mapper = mapper;
 		fetchClientProprietes();
 	}
 	
@@ -61,14 +63,6 @@ public class MongoDBClient implements DBClient {
 		
 	}
 	
-	public Mapper getMapper() {
-		return mapper;
-	}
-
-	public void setMapper(Mapper mapper) {
-		this.mapper = mapper;
-	}
-	
 	private void fetchClientProprietes() {
 		String host = CentaurusConfig.getInstance().getDbHost();
 		int port = Integer.valueOf(CentaurusConfig.getInstance().getDbPort());
@@ -91,6 +85,36 @@ public class MongoDBClient implements DBClient {
 			log.error(String.format("Cannot connect to %s:%d %s", host, port, dbName));
 			throw new CentaurusException(String.format("Cannot connect to %s:%d %s", host, port, dbName), e);
 		}
+	}
+
+	public <T> List<T> list() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <T> List<T> list(QueryData queryData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <T> T first() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <T> T first(QueryData queryData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <T> T last() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public <T> T last(QueryData queryData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
  
 }

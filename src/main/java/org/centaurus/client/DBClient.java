@@ -1,12 +1,15 @@
 package org.centaurus.client;
 
-import java.io.Serializable;
+import java.util.List;
+
+import org.centaurus.dql.QueryData;
+
 
 /**
  * 
  * @author Vladislav Socolov
  */
-public interface DBClient extends Serializable {
+public interface DBClient {
 
 	public <T> T insert(T document);
 
@@ -16,11 +19,20 @@ public interface DBClient extends Serializable {
 
 	public <T> void delete(T document);
 
+	public <T> List<T> list();
+	
+	public <T> List<T> list(QueryData queryData);
+	
+	public <T> T first();
+	
+	public <T> T first(QueryData queryData);
+	
+	public <T> T last();
+	
+	public <T> T last(QueryData queryData);
+	
 	public void clear();
 
 	public void close();
-	
-	public Mapper getMapper();
 
-	public void setMapper(Mapper mapper);
 }

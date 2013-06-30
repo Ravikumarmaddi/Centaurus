@@ -9,7 +9,7 @@ import org.centaurus.enums.Operator;
 
 /**
  * 
- * @author Socolov Vladislav
+ * @author Vladislav Socolov
  */
 public class Expression implements Serializable {
 	private static final long serialVersionUID = -4764922849082909423L;

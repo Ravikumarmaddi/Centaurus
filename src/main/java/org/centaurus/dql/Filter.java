@@ -7,7 +7,7 @@ import org.centaurus.enums.Operator;
 
 /**
  * 
- * @author Socolov Vladislav
+ * @author Vladislav Socolov
  */
 public class Filter {
 

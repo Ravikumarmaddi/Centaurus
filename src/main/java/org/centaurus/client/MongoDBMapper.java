@@ -3,7 +3,6 @@ package org.centaurus.client;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import org.centaurus.ScannerTemplate;
 import org.centaurus.annotations.Document;
 import org.centaurus.annotations.Id;
 import org.centaurus.configuration.CentaurusConfig;

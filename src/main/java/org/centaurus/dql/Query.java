@@ -1,5 +1,7 @@
 package org.centaurus.dql;
 
+import java.util.List;
+
 import org.centaurus.enums.Sorting;
 
 /**
@@ -12,9 +14,15 @@ public interface Query {
 	
 	public Query where(Filter... filter);
 	
-	public Query offset(long offset);
+	public Query offset(Long offset);
 	
-	public Query limit(long limit);
+	public Query limit(Long limit);
 	
 	public Query sort(String field, Sorting sorting);
+	
+	public <T> List<T> list();
+	
+	public <T> T first();
+	
+	public <T> T last();
 }
