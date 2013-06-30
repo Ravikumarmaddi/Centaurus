@@ -23,7 +23,6 @@ public class SessionImpl implements Session {
 	SessionImpl(ScannerTemplate scanner) throws CentaurusException{
 		DBType db = CentaurusConfig.getInstance().getDbTypeEnum();
 		dbClient = DBClientFactory.buildDBClient(db);
-		dbClient.getMapper().setScanner(scanner);
 	}
 	
 	public <T> T insert(T document) {

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.centaurus.annotations.ConfigProperty;
 import org.centaurus.enums.DBType;
+import org.centaurus.exceptions.CentaurusException;
 
 /**
  * 
@@ -77,7 +78,11 @@ public class CentaurusConfig implements Serializable {
 	}
 
 	public DBType getDbTypeEnum() {
-		return DBType.valueOf(dbType);
+		try {
+			return DBType.valueOf(dbType);
+		} catch (Exception e) {
+			throw new CentaurusException("Cannot find or bad format db_type property in centaurus.cfg.xml");
+		}
 	}
 	
 	public void setDbType(String dbType) {

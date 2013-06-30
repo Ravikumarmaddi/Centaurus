@@ -50,33 +50,40 @@ public class ConfigurationFileParser {
 			
 			List<String> classMappingList = new ArrayList<String>();
 			List<String> packageMappingList = new ArrayList<String>();
-			for (MappingElement mapping : configElement.getMappingElement()) {
-				if(mapping.getPackagePath() != null){
-					packageMappingList.add(mapping.getPackagePath());
-				} else {
-					classMappingList.add(mapping.getClassPath());
-				}
-			}
-			CentaurusConfig.getInstance().setClassMappingList(classMappingList);
-			log.info("Read configuration file. Set mapping.class property.");
-			CentaurusConfig.getInstance().setPackageMappingList(packageMappingList);
-			log.info("Read configuration file. Set mapping.package property.");
-			
-			for (PropertyElement property : configElement.getPropertyElements()) {
-				Field[] declaredFields = CentaurusConfig.getInstance().getClass().getDeclaredFields();
-				for (Field field : declaredFields) {
-					ConfigProperty annotation = field.getAnnotation(ConfigProperty.class);
-					if(annotation != null && annotation.name().equals(property.getName())){
-						field.setAccessible(true);
-						Class<?> type = field.getType();
-						try {
-							field.set(CentaurusConfig.getInstance(), type.cast(property.getValue()));	
-							log.info(String.format("Read configuration file. Set %s property.", property.getName()));
-						} catch (Exception e) {
-							throw new ConfigurationException(String.format("Cannot set %s property.", property.getName()), e);
-						}
+			List<MappingElement> mappingElements = configElement.getMappingElement();
+			if(mappingElements != null){
+				for (MappingElement mapping : configElement.getMappingElement()) {
+					if(mapping.getPackagePath() != null){
+						packageMappingList.add(mapping.getPackagePath());
+					} else {
+						classMappingList.add(mapping.getClassPath());
 					}
 				}
+				CentaurusConfig.getInstance().setClassMappingList(classMappingList);
+				log.info("Read configuration file. Set mapping.class property.");
+				CentaurusConfig.getInstance().setPackageMappingList(packageMappingList);
+				log.info("Read configuration file. Set mapping.package property.");
+			}
+			
+			if(configElement.getPropertyElements() != null){
+				for (PropertyElement property : configElement.getPropertyElements()) {
+					Field[] declaredFields = CentaurusConfig.getInstance().getClass().getDeclaredFields();
+					for (Field field : declaredFields) {
+						ConfigProperty annotation = field.getAnnotation(ConfigProperty.class);
+						if(annotation != null && annotation.name().equals(property.getName())){
+							field.setAccessible(true);
+							Class<?> type = field.getType();
+							try {
+								field.set(CentaurusConfig.getInstance(), type.cast(property.getValue()));	
+								log.info(String.format("Read configuration file. Set %s property.", property.getName()));
+							} catch (Exception e) {
+								throw new ConfigurationException(String.format("Cannot set %s property.", property.getName()), e);
+							}
+						}
+					}
+				}	
+			} else {
+				throw new ConfigurationException("Cannot find proprietes elements in centaurus.cfg.xml file.");
 			}
 		} catch (JAXBException e) {
 			throw new ConfigurationException(String.format("Cannot find %s file in project classpath.", CentaurusConfig.getInstance().getConfigFileName()));

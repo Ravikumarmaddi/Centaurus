@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import org.centaurus.ScannerTemplate;
 import org.centaurus.annotations.Document;
 import org.centaurus.annotations.Id;
+import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.exceptions.CentaurusException;
 
 import com.mongodb.BasicDBObject;
@@ -16,8 +17,6 @@ import com.mongodb.BasicDBObject;
  * @author Vladislav Socolov
  */
 public class MongoDBMapper implements Mapper {
-	
-	private ScannerTemplate scanner;
 	
 	@SuppressWarnings("unchecked")
 	public <T> T documentToDBObject(Object document) {
@@ -62,7 +61,7 @@ public class MongoDBMapper implements Mapper {
 	}
 
 	public boolean isMapped(Class<?> clazz) {
-		if(getScanner() != null && getScanner().getMappedClasses().contains(clazz)){
+		if(CentaurusConfig.getInstance().getMappedClasses().contains(clazz)){
 			return true;
 		}
 		return false;
@@ -74,14 +73,6 @@ public class MongoDBMapper implements Mapper {
 			return annotation.collection().equals("") ? clazz.getSimpleName() : annotation.collection();
 		}	
 		return null;
-	}
-	
-	public ScannerTemplate getScanner() {
-		return scanner;
-	}
-
-	public void setScanner(ScannerTemplate scanner) {
-		this.scanner = scanner;
 	}
 	
 }
