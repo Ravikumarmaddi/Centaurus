@@ -1,5 +1,7 @@
 package org.centaurus.client;
 
+import org.centaurus.client.mongodb.MongoDBClient;
+import org.centaurus.client.mongodb.MongoDBMapper;
 import org.centaurus.enums.DBType;
 
 /**

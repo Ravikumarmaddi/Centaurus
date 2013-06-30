@@ -1,10 +1,11 @@
-package org.centaurus.client;
+package org.centaurus.client.mongodb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import org.centaurus.annotations.Document;
 import org.centaurus.annotations.Id;
+import org.centaurus.client.Mapper;
 import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.exceptions.CentaurusException;
 

@@ -30,13 +30,11 @@ public class SessionImpl implements Session {
 	}
 
 	public <T> T insertOrUpdate(T document) {
-		// TODO Auto-generated method stub
-		return null;
+		return dbClient.insertOrUpdate(document);
 	}
 
 	public <T> T update(T document) {
-		// TODO Auto-generated method stub
-		return null;
+		return dbClient.update(document);
 	}
 
 	public <T> void delete(T document) {
@@ -44,13 +42,11 @@ public class SessionImpl implements Session {
 	}
 
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		dbClient.clear();
 	}
 
 	public void close() throws CentaurusException {
-		// TODO Auto-generated method stub
-		
+		dbClient.close();
 	}
 
 }
