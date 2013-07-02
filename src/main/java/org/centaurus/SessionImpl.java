@@ -3,6 +3,8 @@ package org.centaurus;
 import org.centaurus.client.DBClient;
 import org.centaurus.client.DBClientFactory;
 import org.centaurus.configuration.CentaurusConfig;
+import org.centaurus.dql.Query;
+import org.centaurus.dql.QueryImpl;
 import org.centaurus.enums.DBType;
 import org.centaurus.exceptions.CentaurusException;
 
@@ -12,19 +14,14 @@ import org.centaurus.exceptions.CentaurusException;
  */
 public class SessionImpl implements Session {
 	private static final long serialVersionUID = -2723525933848519576L;
-	
+
 	private DBClient dbClient;
-	
-	SessionImpl() throws CentaurusException{
+
+	SessionImpl() throws CentaurusException {
 		DBType db = CentaurusConfig.getInstance().getDbTypeEnum();
 		dbClient = DBClientFactory.buildDBClient(db);
 	}
-	
-	SessionImpl(ScannerTemplate scanner) throws CentaurusException{
-		DBType db = CentaurusConfig.getInstance().getDbTypeEnum();
-		dbClient = DBClientFactory.buildDBClient(db);
-	}
-	
+
 	public <T> T insert(T document) {
 		return dbClient.insert(document);
 	}
@@ -47,6 +44,10 @@ public class SessionImpl implements Session {
 
 	public void close() throws CentaurusException {
 		dbClient.close();
+	}
+
+	public Query createQuery(Class<?> document) {
+		return new QueryImpl(document, dbClient);
 	}
 
 }

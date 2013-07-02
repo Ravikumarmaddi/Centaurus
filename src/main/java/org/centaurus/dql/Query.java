@@ -10,9 +10,9 @@ import org.centaurus.enums.Sorting;
  */
 public interface Query {
 
-	public Query where(Filter filter);
+	public Query where(Expression expression);
 	
-	public Query where(Filter... filter);
+	public Query where(Expression... expression);
 	
 	public Query offset(Long offset);
 	

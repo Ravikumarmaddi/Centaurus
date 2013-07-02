@@ -55,8 +55,10 @@ public class MongoDBClient implements DBClient {
 		collection.remove(dbObject); 
 	}
 
-	public <T> List<T> list() {
-		// TODO Auto-generated method stub
+	public <T> List<T> list(Class<?> document) {
+		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
+		Object cast = document.cast(mapper.dbObjectToDocument(document, null));
+		
 		return null;
 	}
 

@@ -19,7 +19,7 @@ public interface DBClient {
 
 	public <T> void delete(T document);
 
-	public <T> List<T> list();
+	public <T> List<T> list(Class<?> document);
 	
 	public <T> List<T> list(QueryData queryData);
 	

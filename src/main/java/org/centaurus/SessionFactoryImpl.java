@@ -17,7 +17,7 @@ public class SessionFactoryImpl implements SessionFactory{
 	}
 	
 	public Session openSession() throws CentaurusException {
-		session = new SessionImpl(scanner);
+		session = new SessionImpl();
 		return session;
 	}
 

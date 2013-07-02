@@ -10,7 +10,7 @@ import java.util.List;
 public abstract class QueryData {
 	
 	private Class<?> document;
-	private List<Filter> filterList;
+	private List<Expression> expressionList;
 	private Long offset;
 	private Long limit;
 	private SortOption sortOption;
@@ -27,15 +27,15 @@ public abstract class QueryData {
 		this.document = document;
 	}
 	
-	public List<Filter> getFilterList() {
-		if (filterList == null) {
-			filterList = new ArrayList<Filter>();
+	public List<Expression> getExpressionList() {
+		if (expressionList == null) {
+			expressionList = new ArrayList<Expression>();
 		}
-		return filterList;
+		return expressionList;
 	}
 
-	public void setFilterList(List<Filter> filterList) {
-		this.filterList = filterList;
+	public void setExpressionList(List<Expression> expressionList) {
+		this.expressionList = expressionList;
 	}
 
 	public Long getOffset() {
@@ -63,7 +63,7 @@ public abstract class QueryData {
 	}
 
 	public boolean hasFilterOptions(){
-		if(getFilterList().size() == 0 || getOffset() == null 
+		if(getExpressionList().size() == 0 || getOffset() == null 
 				 || getLimit() == null || getSortOption() == null){
 			return false;
 		}

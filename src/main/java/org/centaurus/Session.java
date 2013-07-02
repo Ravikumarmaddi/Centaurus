@@ -2,6 +2,7 @@ package org.centaurus;
 
 import java.io.Serializable;
 
+import org.centaurus.dql.Query;
 import org.centaurus.exceptions.CentaurusException;
 
 /**
@@ -17,6 +18,8 @@ public interface Session extends Serializable{
 	public <T> T update(T document);
 	
 	public <T> void delete(T document);
+	
+	public Query createQuery(Class<?> document);
 	
 	public void clear();
 	

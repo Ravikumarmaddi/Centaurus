@@ -19,13 +19,13 @@ public class QueryImpl extends QueryData implements Query {
 		this.dbClient = dbClient;
 	}
 	
-	public Query where(Filter filter) {
-		getFilterList().add(filter);
+	public Query where(Expression expression) {
+		getExpressionList().add(expression);
 		return this;
 	}
 
-	public Query where(Filter... filter) {
-		getFilterList().addAll(Arrays.asList(filter));
+	public Query where(Expression... expression) {
+		getExpressionList().addAll(Arrays.asList(expression));
 		return this;
 	}
 
@@ -46,9 +46,9 @@ public class QueryImpl extends QueryData implements Query {
 
 	public <T> List<T> list() {
 		if(hasFilterOptions()){
-			return dbClient.list(this); 
+			return dbClient.list(this); //Send all filter conditions
 		}
-		return dbClient.list();
+		return dbClient.list(getDocument()); //Send only document class
 	}
 
 	public <T> T first() {
