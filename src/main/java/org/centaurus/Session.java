@@ -19,7 +19,7 @@ public interface Session extends Serializable{
 	
 	public <T> void delete(T document);
 	
-	public Query createQuery(Class<?> document);
+	public <T> Query<T> createQuery(Class<T> document);
 	
 	public void clear();
 	

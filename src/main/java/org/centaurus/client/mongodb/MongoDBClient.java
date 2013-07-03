@@ -1,6 +1,7 @@
 package org.centaurus.client.mongodb;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,8 +11,10 @@ import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.dql.QueryData;
 import org.centaurus.exceptions.CentaurusException;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
@@ -55,11 +58,15 @@ public class MongoDBClient implements DBClient {
 		collection.remove(dbObject); 
 	}
 
-	public <T> List<T> list(Class<?> document) {
+	public <T> List<T> list(Class<T> document) {
+		List<T> list = new ArrayList<T>();
 		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
-		Object cast = document.cast(mapper.dbObjectToDocument(document, null));
-		
-		return null;
+		DBCursor cursor = collection.find();
+		for (DBObject dbObject : cursor) {
+			list.add(document.cast(mapper.dbObjectToDocument(document, dbObject)));
+		}
+		//Object cast = document.cast(mapper.dbObjectToDocument(document, null));		
+		return list;
 	}
 
 	public <T> List<T> list(QueryData queryData) {
@@ -67,9 +74,11 @@ public class MongoDBClient implements DBClient {
 		return null;
 	}
 
-	public <T> T first() {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T first(Class<T> document) {
+		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
+		DBCursor limit = collection.find().limit(1);
+
+		return document.cast(mapper.dbObjectToDocument(document, limit.toArray(1).get(0)));
 	}
 
 	public <T> T first(QueryData queryData) {
@@ -77,9 +86,11 @@ public class MongoDBClient implements DBClient {
 		return null;
 	}
 
-	public <T> T last() {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T last(Class<T> document) {
+		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
+		DBCursor limit = collection.find().sort(new BasicDBObject("_id", -1)).limit(1);
+
+		return document.cast(mapper.dbObjectToDocument(document, limit.toArray(1).get(0)));
 	}
 
 	public <T> T last(QueryData queryData) {

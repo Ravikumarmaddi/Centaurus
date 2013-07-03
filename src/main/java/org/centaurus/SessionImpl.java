@@ -46,8 +46,8 @@ public class SessionImpl implements Session {
 		dbClient.close();
 	}
 
-	public Query createQuery(Class<?> document) {
-		return new QueryImpl(document, dbClient);
+	public <T> Query<T> createQuery(Class<T> document) {
+		return new QueryImpl<T>(document, dbClient);
 	}
 
 }

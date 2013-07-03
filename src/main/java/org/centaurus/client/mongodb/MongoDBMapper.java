@@ -58,7 +58,7 @@ public class MongoDBMapper implements Mapper {
 
 	@SuppressWarnings("unchecked")
 	public <T> T dbObjectToDocument(Class<T> document, Object dbObject) {
-		if(!isMapped(document)){
+		if(isMapped(document)){
 			try {
 				Object bean = document.getConstructor().newInstance();
 				DBObject dbObj = (DBObject) dbObject;

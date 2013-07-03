@@ -10,7 +10,8 @@ import org.centaurus.enums.Sorting;
  * 
  * @author Vladislav Socolov
  */
-public class QueryImpl extends QueryData implements Query {
+@SuppressWarnings("unchecked")
+public class QueryImpl<T> extends QueryData implements Query<T> {
 
 	private DBClient dbClient;
 	
@@ -19,50 +20,50 @@ public class QueryImpl extends QueryData implements Query {
 		this.dbClient = dbClient;
 	}
 	
-	public Query where(Expression expression) {
+	public Query<T> where(Expression expression) {
 		getExpressionList().add(expression);
 		return this;
 	}
 
-	public Query where(Expression... expression) {
+	public Query<T> where(Expression... expression) {
 		getExpressionList().addAll(Arrays.asList(expression));
 		return this;
 	}
 
-	public Query offset(Long offset) {
+	public Query<T> offset(Long offset) {
 		setOffset(offset);
 		return this;
 	}
 
-	public Query limit(Long limit) {
+	public Query<T> limit(Long limit) {
 		setLimit(limit);
 		return this;
 	}
 
-	public Query sort(String field, Sorting sorting) {
+	public Query<T> sort(String field, Sorting sorting) {
 		setSortOption(new SortOption(field, sorting));
 		return this;
 	}
 
-	public <T> List<T> list() {
+	public List<T> list() {
 		if(hasFilterOptions()){
 			return dbClient.list(this); //Send all filter conditions
 		}
-		return dbClient.list(getDocument()); //Send only document class
+		return (List<T>) dbClient.list(getDocument()); //Send only document class
 	}
 
-	public <T> T first() {
+	public T first() {
 		if(hasFilterOptions()){
-			return dbClient.first(this);
+			return dbClient.first(this); //Send all filter conditions
 		}
-		return dbClient.first();
+		return (T) dbClient.first(getDocument()); //Send only document class
 	}
 
-	public <T> T last() {
+	public T last() {
 		if(hasFilterOptions()){
-			return dbClient.last(this);
+			return dbClient.last(this); //Send all filter conditions
 		}
-		return dbClient.last();
+		return (T) dbClient.last(getDocument()); //Send only document class
 	}
 
 }
