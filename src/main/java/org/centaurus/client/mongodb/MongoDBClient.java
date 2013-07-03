@@ -24,6 +24,7 @@ import com.mongodb.ServerAddress;
  * @author Vladislav Socolov
  */
 public class MongoDBClient implements DBClient {
+	
 	private static Logger log = Logger.getLogger(MongoDBClient.class);
 	
 	private MongoClient mongoClient;
@@ -65,7 +66,7 @@ public class MongoDBClient implements DBClient {
 		for (DBObject dbObject : cursor) {
 			list.add(document.cast(mapper.dbObjectToDocument(document, dbObject)));
 		}
-		//Object cast = document.cast(mapper.dbObjectToDocument(document, null));		
+		
 		return list;
 	}
 
@@ -98,14 +99,23 @@ public class MongoDBClient implements DBClient {
 		return null;
 	}
 	
+	public <T> Number count(Class<T> document) {
+		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
+		return collection.count();
+	}
+
+	public Number count(QueryData queryData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public void clear() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void close() {
-		// TODO Auto-generated method stub
-		
+		mongoClient.close();
 	}
 	
 	private void fetchClientProprietes() {

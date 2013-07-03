@@ -25,4 +25,6 @@ public interface Query<T> {
 	public T first();
 
 	public T last();
+	
+	public Number count();
 }

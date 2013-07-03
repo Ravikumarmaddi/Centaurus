@@ -66,4 +66,11 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 		return (T) dbClient.last(getDocument()); //Send only document class
 	}
 
+	public Number count() {
+		if(hasFilterOptions()){
+			return dbClient.count(this); //Send all filter conditions
+		}
+		return dbClient.count(getDocument()); //Send only document class
+	}
+
 }

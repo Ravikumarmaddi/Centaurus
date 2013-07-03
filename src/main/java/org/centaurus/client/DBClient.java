@@ -31,6 +31,10 @@ public interface DBClient {
 	
 	public <T> T last(QueryData queryData);
 	
+	public <T> Number count(Class<T> document);
+	
+	public Number count(QueryData queryData);
+	
 	public void clear();
 
 	public void close();
