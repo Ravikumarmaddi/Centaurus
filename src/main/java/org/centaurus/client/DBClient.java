@@ -21,7 +21,7 @@ public interface DBClient {
 
 	public <T> List<T> list(Class<T> document);
 	
-	public <T> List<T> list(QueryData queryData);
+	public <T> List<T> list(Class<T> document, QueryData queryData);
 	
 	public <T> T first(Class<T> document);
 	

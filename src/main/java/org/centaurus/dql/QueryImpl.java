@@ -46,31 +46,47 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 	}
 
 	public List<T> list() {
+		List<T> list = null;
 		if(hasFilterOptions()){
-			return dbClient.list(this); //Send all filter conditions
+			list = (List<T>) dbClient.list(getDocument(), this); //Send all filter conditions
+		} else {
+			list = (List<T>) dbClient.list(getDocument()); //Send only document class	
 		}
-		return (List<T>) dbClient.list(getDocument()); //Send only document class
+		clearFilters();
+		return list;
 	}
 
 	public T first() {
+		T bean = null;
 		if(hasFilterOptions()){
-			return dbClient.first(this); //Send all filter conditions
+			bean = dbClient.first(this); //Send all filter conditions
+		} else {
+			bean = (T) dbClient.first(getDocument()); //Send only document class
 		}
-		return (T) dbClient.first(getDocument()); //Send only document class
+		clearFilters();
+		return bean;
 	}
 
 	public T last() {
+		T bean = null;
 		if(hasFilterOptions()){
-			return dbClient.last(this); //Send all filter conditions
+			bean = dbClient.last(this); //Send all filter conditions
+		} else {
+			bean = (T) dbClient.last(getDocument()); //Send only document class	
 		}
-		return (T) dbClient.last(getDocument()); //Send only document class
+		clearFilters();
+		return bean;
 	}
 
 	public Number count() {
+		Number count = null;
 		if(hasFilterOptions()){
-			return dbClient.count(this); //Send all filter conditions
+			count = dbClient.count(this); //Send all filter conditions
+		} else {
+			count = dbClient.count(getDocument()); //Send only document class
 		}
-		return dbClient.count(getDocument()); //Send only document class
+		clearFilters();
+		return count;
 	}
 
 }

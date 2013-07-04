@@ -63,10 +63,17 @@ public abstract class QueryData {
 	}
 
 	public boolean hasFilterOptions(){
-		if(getExpressionList().size() == 0 || getOffset() == null 
-				 || getLimit() == null || getSortOption() == null){
-			return false;
+		if(getExpressionList().size() != 0 || getOffset() != null 
+				 || getLimit() != null || getSortOption() != null){
+			return true;
 		}
-		return true;
+		return false;
+	}
+	
+	public void clearFilters(){
+		getExpressionList().clear();
+		setOffset(null);
+		setLimit(null);
+		setSortOption(null);
 	}
 }

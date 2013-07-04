@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.centaurus.client.DBClient;
 import org.centaurus.client.Mapper;
+import org.centaurus.client.QueryProcessor;
 import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.dql.QueryData;
 import org.centaurus.exceptions.CentaurusException;
@@ -70,9 +71,28 @@ public class MongoDBClient implements DBClient {
 		return list;
 	}
 
-	public <T> List<T> list(QueryData queryData) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> List<T> list(Class<T> document, QueryData queryData) {
+		QueryProcessor<BasicDBObject> queryProcessor = new MongoDBQueryProcessor<BasicDBObject>();
+		DBCursor cursor = mongoDB.getCollection(mapper.getCollectionName(document)).find();
+		if(!queryData.getExpressionList().isEmpty()){
+			//TODO cursor = blah blah blah
+		}
+		if(queryData.getOffset() != null){
+			//TODO get offset object
+		}
+		if(queryData.getLimit() != null){
+			//TODO get limit object
+		}
+		if(queryData.getSortOption() != null){
+			cursor.sort(queryProcessor.processSortClause(queryData));
+		}
+		
+		List<T> list = new ArrayList<T>();
+		for (DBObject dbObject : cursor) {
+			list.add(document.cast(mapper.dbObjectToDocument(document, dbObject)));
+		}
+		
+		return list;
 	}
 
 	public <T> T first(Class<T> document) {
