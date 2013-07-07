@@ -30,12 +30,12 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 		return this;
 	}
 
-	public Query<T> offset(Long offset) {
+	public Query<T> offset(Number offset) {
 		setOffset(offset);
 		return this;
 	}
 
-	public Query<T> limit(Long limit) {
+	public Query<T> limit(Number limit) {
 		setLimit(limit);
 		return this;
 	}

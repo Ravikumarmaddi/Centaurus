@@ -75,13 +75,13 @@ public class MongoDBClient implements DBClient {
 		QueryProcessor<BasicDBObject> queryProcessor = new MongoDBQueryProcessor<BasicDBObject>();
 		DBCursor cursor = mongoDB.getCollection(mapper.getCollectionName(document)).find();
 		if(!queryData.getExpressionList().isEmpty()){
-			//TODO cursor = blah blah blah
+			cursor = mongoDB.getCollection(mapper.getCollectionName(document)).find(queryProcessor.processWhereClause(queryData));
 		}
 		if(queryData.getOffset() != null){
-			//TODO get offset object
+			cursor.skip(queryData.getOffset().intValue());
 		}
 		if(queryData.getLimit() != null){
-			//TODO get limit object
+			cursor.limit(queryData.getLimit().intValue());
 		}
 		if(queryData.getSortOption() != null){
 			cursor.sort(queryProcessor.processSortClause(queryData));

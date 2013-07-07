@@ -30,7 +30,7 @@ public class Scanner extends ScannerTemplate{
 
 	@Override
 	protected void scanConfigurationFile() throws ConfigurationException {
-    	log.info("CENTAURUS scanner step 1: Scanning configuration file.");
+    	log.info("Scanner step 1: Scanning configuration file.");
 		fileParser.parseConfigFile();
 	}
 
@@ -39,7 +39,7 @@ public class Scanner extends ScannerTemplate{
 		AnnotationDB db = new AnnotationDB();
 		Set<URL> urlPaths = new HashSet<URL>();
 
-		log.info("CENTAURUS scanner step 2: Scanning configuration packages.");
+		log.info("Scanner step 2: Scanning configuration packages.");
 		if(CentaurusConfig.getInstance().getPackageMappingList() != null){
 			for (String path : CentaurusConfig.getInstance().getPackageMappingList()) {
 				String pathString = TARGET_PREFIX.concat(path).replace('.', '/');
@@ -77,7 +77,7 @@ public class Scanner extends ScannerTemplate{
 	
 	@Override
 	protected void scanClasses() {
-		log.info("CENTAURUS scanner step 3: Scanning configuration classes.");
+		log.info("Scanner step 3: Scanning configuration classes.");
 		if(CentaurusConfig.getInstance().getClassMappingList() != null){
 			for (String className: CentaurusConfig.getInstance().getClassMappingList()) {
 				if(!CentaurusConfig.getInstance().getMappedClasses().contains(className)){

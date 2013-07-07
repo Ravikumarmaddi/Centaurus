@@ -11,8 +11,8 @@ public abstract class QueryData {
 	
 	private Class<?> document;
 	private List<Expression> expressionList;
-	private Long offset;
-	private Long limit;
+	private Number offset;
+	private Number limit;
 	private SortOption sortOption;
 	
 	public QueryData(Class<?> document){
@@ -38,19 +38,19 @@ public abstract class QueryData {
 		this.expressionList = expressionList;
 	}
 
-	public Long getOffset() {
+	public Number getOffset() {
 		return offset;
 	}
 
-	public void setOffset(Long offset) {
+	public void setOffset(Number offset) {
 		this.offset = offset;
 	}
 
-	public Long getLimit() {
+	public Number getLimit() {
 		return limit;
 	}
 
-	public void setLimit(Long limit) {
+	public void setLimit(Number limit) {
 		this.limit = limit;
 	}
 
@@ -75,5 +75,22 @@ public abstract class QueryData {
 		setOffset(null);
 		setLimit(null);
 		setSortOption(null);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("QueryData [document=");
+		builder.append(document);
+		builder.append(", expressionList=");
+		builder.append(expressionList);
+		builder.append(", offset=");
+		builder.append(offset);
+		builder.append(", limit=");
+		builder.append(limit);
+		builder.append(", sortOption=");
+		builder.append(sortOption);
+		builder.append("]");
+		return builder.toString();
 	}
 }

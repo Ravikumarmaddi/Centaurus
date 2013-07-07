@@ -10,9 +10,9 @@ public interface QueryProcessor<T> {
 	
 	public T processWhereClause(QueryData queryData);
 
-	public T processOffsetClause(QueryData queryData);
+	public Number processOffsetClause(QueryData queryData);
 
-	public T processLimitClause(QueryData queryData);
+	public Number processLimitClause(QueryData queryData);
 
 	public T processSortClause(QueryData queryData);
 
