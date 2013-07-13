@@ -14,9 +14,10 @@ import org.centaurus.enums.Sorting;
 public class QueryImpl<T> extends QueryData implements Query<T> {
 
 	private DBClient dbClient;
+	private Class<?> document;
 	
 	public QueryImpl(Class<?> document, DBClient dbClient){
-		super(document);
+		this.document = document;
 		this.dbClient = dbClient;
 	}
 	
@@ -48,9 +49,9 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 	public List<T> list() {
 		List<T> list = null;
 		if(hasFilterOptions()){
-			list = (List<T>) dbClient.list(getDocument(), this); //Send all filter conditions
+			list = (List<T>) dbClient.list(document, this); //Send all filter conditions
 		} else {
-			list = (List<T>) dbClient.list(getDocument()); //Send only document class	
+			list = (List<T>) dbClient.list(document); //Send only document class	
 		}
 		clearFilters();
 		return list;
@@ -59,9 +60,9 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 	public T first() {
 		T bean = null;
 		if(hasFilterOptions()){
-			bean = dbClient.first(this); //Send all filter conditions
+			bean = (T) dbClient.first(document, this); //Send all filter conditions
 		} else {
-			bean = (T) dbClient.first(getDocument()); //Send only document class
+			bean = (T) dbClient.first(document); //Send only document class
 		}
 		clearFilters();
 		return bean;
@@ -70,9 +71,9 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 	public T last() {
 		T bean = null;
 		if(hasFilterOptions()){
-			bean = dbClient.last(this); //Send all filter conditions
+			bean = (T) dbClient.last(document, this); //Send all filter conditions
 		} else {
-			bean = (T) dbClient.last(getDocument()); //Send only document class	
+			bean = (T) dbClient.last(document); //Send only document class	
 		}
 		clearFilters();
 		return bean;
@@ -81,9 +82,9 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 	public Number count() {
 		Number count = null;
 		if(hasFilterOptions()){
-			count = dbClient.count(this); //Send all filter conditions
+			count = dbClient.count(document, this); //Send all filter conditions
 		} else {
-			count = dbClient.count(getDocument()); //Send only document class
+			count = dbClient.count(document); //Send only document class
 		}
 		clearFilters();
 		return count;

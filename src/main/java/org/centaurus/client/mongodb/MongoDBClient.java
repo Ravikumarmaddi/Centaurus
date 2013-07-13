@@ -31,9 +31,11 @@ public class MongoDBClient implements DBClient {
 	private MongoClient mongoClient;
 	private DB mongoDB;
 	private Mapper mapper;
+	QueryProcessor<DBObject> queryProcessor;
 	
 	public MongoDBClient(Mapper mapper) {
 		this.mapper = mapper;
+		queryProcessor = new MongoDBQueryProcessor<DBObject>();
 		fetchClientProprietes();
 	}
 	
@@ -71,23 +73,9 @@ public class MongoDBClient implements DBClient {
 		return list;
 	}
 
-	public <T> List<T> list(Class<T> document, QueryData queryData) {
-		QueryProcessor<BasicDBObject> queryProcessor = new MongoDBQueryProcessor<BasicDBObject>();
-		DBCursor cursor = mongoDB.getCollection(mapper.getCollectionName(document)).find();
-		if(!queryData.getExpressionList().isEmpty()){
-			cursor = mongoDB.getCollection(mapper.getCollectionName(document)).find(queryProcessor.processWhereClause(queryData));
-		}
-		if(queryData.getOffset() != null){
-			cursor.skip(queryData.getOffset().intValue());
-		}
-		if(queryData.getLimit() != null){
-			cursor.limit(queryData.getLimit().intValue());
-		}
-		if(queryData.getSortOption() != null){
-			cursor.sort(queryProcessor.processSortClause(queryData));
-		}
-		
+	public <T> List<T> list(Class<T> document, QueryData queryData) {	
 		List<T> list = new ArrayList<T>();
+		DBCursor cursor = processQueryClauses(document, queryData);
 		for (DBObject dbObject : cursor) {
 			list.add(document.cast(mapper.dbObjectToDocument(document, dbObject)));
 		}
@@ -99,12 +87,12 @@ public class MongoDBClient implements DBClient {
 		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
 		DBCursor limit = collection.find().limit(1);
 
-		return document.cast(mapper.dbObjectToDocument(document, limit.toArray(1).get(0)));
+		return document.cast(mapper.dbObjectToDocument(document, limit.next()));
 	}
 
-	public <T> T first(QueryData queryData) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T first(Class<T> document, QueryData queryData) {
+		DBCursor cursor = processQueryClauses(document, queryData);
+		return document.cast(mapper.dbObjectToDocument(document, cursor.next()));
 	}
 
 	public <T> T last(Class<T> document) {
@@ -114,19 +102,17 @@ public class MongoDBClient implements DBClient {
 		return document.cast(mapper.dbObjectToDocument(document, limit.toArray(1).get(0)));
 	}
 
-	public <T> T last(QueryData queryData) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T last(Class<T> document, QueryData queryData) {
+		DBCursor cursor = processQueryClauses(document, queryData).sort(new BasicDBObject("_id", -1)).limit(1);
+		return document.cast(mapper.dbObjectToDocument(document, cursor.next()));
 	}
 	
-	public <T> Number count(Class<T> document) {
-		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
-		return collection.count();
+	public Number count(Class<?> document) {
+		return mongoDB.getCollection(mapper.getCollectionName(document)).count();
 	}
 
-	public Number count(QueryData queryData) {
-		// TODO Auto-generated method stub
-		return null;
+	public Number count(Class<?> document, QueryData queryData) {
+		return processQueryClauses(document, queryData).count();
 	}
 	
 	public void clear() {
@@ -162,4 +148,23 @@ public class MongoDBClient implements DBClient {
 		}
 	}
  
+	private DBCursor processQueryClauses(Class<?> document, QueryData queryData){
+		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
+		DBCursor cursor = collection.find();
+		
+		if(!queryData.getExpressionList().isEmpty()){
+			cursor = collection.find(queryProcessor.processWhereClause(queryData));
+		}
+		if(queryData.getOffset() != null){
+			cursor.skip(queryData.getOffset().intValue());
+		}
+		if(queryData.getLimit() != null){
+			cursor.limit(queryData.getLimit().intValue());
+		}
+		if(queryData.getSortOption() != null){
+			cursor.sort(queryProcessor.processSortClause(queryData));
+		}
+		
+		return cursor;
+	}
 }

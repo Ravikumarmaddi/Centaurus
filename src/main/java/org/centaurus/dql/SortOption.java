@@ -1,12 +1,16 @@
 package org.centaurus.dql;
 
+import java.io.Serializable;
+
 import org.centaurus.enums.Sorting;
 
 /**
  * 
  * @author Vladislav Socolov
  */
-public class SortOption {
+public class SortOption implements Serializable{
+	
+	private static final long serialVersionUID = 9182867430137363582L;
 	
 	private String field;
 	private Sorting sorting;

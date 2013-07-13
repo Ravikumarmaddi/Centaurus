@@ -25,15 +25,15 @@ public interface DBClient {
 	
 	public <T> T first(Class<T> document);
 	
-	public <T> T first(QueryData queryData);
+	public <T> T first(Class<T> document, QueryData queryData);
 	
 	public <T> T last(Class<T> document);
 	
-	public <T> T last(QueryData queryData);
+	public <T> T last(Class<T> document, QueryData queryData);
 	
-	public <T> Number count(Class<T> document);
+	public Number count(Class<?> document);
 	
-	public Number count(QueryData queryData);
+	public Number count(Class<?> document, QueryData queryData);
 	
 	public void clear();
 

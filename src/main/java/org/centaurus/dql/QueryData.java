@@ -9,23 +9,10 @@ import java.util.List;
  */
 public abstract class QueryData {
 	
-	private Class<?> document;
 	private List<Expression> expressionList;
 	private Number offset;
 	private Number limit;
 	private SortOption sortOption;
-	
-	public QueryData(Class<?> document){
-		this.document = document;
-	}
-	
-	public Class<?> getDocument() {
-		return document;
-	}
-
-	public void setDocument(Class<?> document) {
-		this.document = document;
-	}
 	
 	public List<Expression> getExpressionList() {
 		if (expressionList == null) {
@@ -80,9 +67,7 @@ public abstract class QueryData {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("QueryData [document=");
-		builder.append(document);
-		builder.append(", expressionList=");
+		builder.append("QueryData [expressionList=");
 		builder.append(expressionList);
 		builder.append(", offset=");
 		builder.append(offset);
@@ -93,4 +78,5 @@ public abstract class QueryData {
 		builder.append("]");
 		return builder.toString();
 	}
+
 }
