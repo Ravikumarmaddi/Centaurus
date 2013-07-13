@@ -6,6 +6,7 @@ import java.util.List;
 import org.centaurus.client.QueryProcessor;
 import org.centaurus.dql.Expression;
 import org.centaurus.dql.QueryData;
+import org.centaurus.enums.Junction;
 import org.centaurus.enums.Operator;
 
 import com.mongodb.BasicDBObject;
@@ -21,15 +22,15 @@ public class MongoDBQueryProcessor<T extends DBObject> implements QueryProcessor
 
 	public T processWhereClause(QueryData queryData) {	
 		List<Expression> expressionList = queryData.getExpressionList();
-		List<BasicDBObject> filters = new ArrayList<BasicDBObject>();
+		List<T> filters = new ArrayList<T>();
 		for (Expression expression : expressionList) {
 			if(expression.getDescendents() != null){
-				//TODO call recursive logic operator processor
+				filters.add(processNestedLogicalOperators(expression));//process descendents
 			} else {
 				if(expression.getOperator() == Operator.eq){
-					filters.add(new BasicDBObject(expression.getField(), expression.getValue()));
+					filters.add((T) new BasicDBObject(expression.getField(), expression.getValue()));
 				} else {
-					filters.add(new BasicDBObject(expression.getField(), new BasicDBObject("$" + expression.getOperator().name(), expression.getValue())));
+					filters.add((T) new BasicDBObject(expression.getField(), new BasicDBObject("$" + expression.getOperator().name(), expression.getValue())));
 				}
 			}
 		}
@@ -49,8 +50,24 @@ public class MongoDBQueryProcessor<T extends DBObject> implements QueryProcessor
 		return (T) new BasicDBObject(queryData.getSortOption().getField(), queryData.getSortOption().getSorting().getValue());	
 	}
 
-	private BasicDBObject processNestedLogicalOperators(Expression expression){
+	private T processNestedLogicalOperators(Expression expression){
+		Junction junction = expression.getJunction();
+		List<T> nestedFilters = new ArrayList<T>();
+		for (Expression expr : expression.getDescendents()) {
+			if(expr.getDescendents() != null){
+				nestedFilters.add(processNestedLogicalOperators(expr)); //Recursive process
+			} else {
+				if(expr.getOperator() == Operator.eq){
+					nestedFilters.add((T) new BasicDBObject(expr.getField(), expr.getValue()));
+				} else {
+					nestedFilters.add((T) new BasicDBObject(expr.getField(), new BasicDBObject("$" + expr.getOperator().name(), expr.getValue())));
+				}
+			}
+		}
 		
-		return null;
+		if(junction == Junction.AND){
+			return (T) QueryBuilder.start().and(nestedFilters.toArray(new BasicDBObject[0])).get();
+		}
+		return (T) QueryBuilder.start().or(nestedFilters.toArray(new BasicDBObject[0])).get();
 	}
 }
