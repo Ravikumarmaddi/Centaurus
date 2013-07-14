@@ -2,6 +2,9 @@ package org.centaurus.client.mongodb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import org.centaurus.annotations.Document;
 import org.centaurus.annotations.Id;
@@ -85,7 +88,7 @@ public class MongoDBMapper implements Mapper {
 				}
 				return (T) bean;
 			} catch (Throwable e) {
-				throw new CentaurusMappingException("Cannot map dbObject to real object");
+				throw new CentaurusMappingException("Cannot map dbObject to real object", e);
 			}
 
 		} else {
@@ -109,21 +112,29 @@ public class MongoDBMapper implements Mapper {
 	}
 	
 	
-	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value) {		
-		if(type.equals(Integer.class)){
-			return type.cast(((Double)Double.parseDouble(value.toString())).intValue());
-		} else if(type.equals(Long.class)){
-			return type.cast(((Double)Double.parseDouble(value.toString())).longValue());
-		} else if (type.equals(Byte.class)) {
-			return type.cast(((Double)Double.parseDouble(value.toString())).byteValue());
-		} else if (type.equals(Double.class)) {
-			return type.cast(Double.parseDouble(value.toString()));
-		} else if (type.equals(Float.class)) {
-			return type.cast(((Double)Double.parseDouble(value.toString())).floatValue());
-		} else if (type.equals(Boolean.class)) {
-			return type.cast(Boolean.parseBoolean(value.toString()));
-		} else {
-			return type.cast(value.toString());
+	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value) {
+		try {
+			if(type.equals(Integer.class)){
+				return type.cast(((Double)Double.parseDouble(value.toString())).intValue());
+			} else if(type.equals(Long.class)){
+				return type.cast(((Double)Double.parseDouble(value.toString())).longValue());
+			} else if (type.equals(Byte.class)) {
+				return type.cast(((Double)Double.parseDouble(value.toString())).byteValue());
+			} else if (type.equals(Double.class)) {
+				return type.cast(Double.parseDouble(value.toString()));
+			} else if (type.equals(Float.class)) {
+				return type.cast(((Double)Double.parseDouble(value.toString())).floatValue());
+			} else if (type.equals(Boolean.class)) {
+				return type.cast(Boolean.parseBoolean(value.toString()));
+			} else if(type.equals(Date.class)) {
+				SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.ROOT);
+				return type.cast(formatter.parse(value.toString()));
+			}
+			else {
+				return type.cast(value.toString());
+			}	
+		} catch (Exception e) {
+			throw new CentaurusMappingException(String.format("Cannot cast %s value to %s type", value.toString(), type.getName()));
 		}
 	}
 }

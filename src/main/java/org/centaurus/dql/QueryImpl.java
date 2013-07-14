@@ -10,13 +10,12 @@ import org.centaurus.enums.Sorting;
  * 
  * @author Vladislav Socolov
  */
-@SuppressWarnings("unchecked")
 public class QueryImpl<T> extends QueryData implements Query<T> {
 
 	private DBClient dbClient;
-	private Class<?> document;
+	private Class<T> document;
 	
-	public QueryImpl(Class<?> document, DBClient dbClient){
+	public QueryImpl(Class<T> document, DBClient dbClient){
 		this.document = document;
 		this.dbClient = dbClient;
 	}

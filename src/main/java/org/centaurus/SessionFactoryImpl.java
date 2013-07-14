@@ -8,6 +8,7 @@ import org.centaurus.exceptions.CentaurusException;
  */
 public class SessionFactoryImpl implements SessionFactory{
 	private static final long serialVersionUID = 6295585436584281817L;
+	
 	private ScannerTemplate scanner;
 	private Session session;
 	

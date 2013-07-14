@@ -46,7 +46,7 @@ public class Scanner extends ScannerTemplate{
 				try {
 					urlPaths.add(new File(pathString).toURI().toURL());
 				} catch (MalformedURLException e) {
-					log.info(String.format("Cannot cast mapping package path:(%s) to file URL.", pathString));
+					log.error(String.format("Cannot cast mapping package path:(%s) to file URL.", pathString));
 				}
 			}	
 		}
