@@ -36,12 +36,12 @@ public class MongoDBMapper implements Mapper {
 					Object value = field.get(document);
 					Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
 					for (Annotation annotation : declaredAnnotations) {
-						if(annotation instanceof org.centaurus.annotations.Field){
+						if(annotation instanceof org.centaurus.annotations.Field) {
 							org.centaurus.annotations.Field fld = (org.centaurus.annotations.Field) annotation;
 							String fieldAnnotationName = fld.name().equals("") ? name : fld.name(); 
 							dbObject.put(fieldAnnotationName, type.cast(value));
 							break;
-						}else if(annotation instanceof Id){
+						}else if(annotation instanceof Id) {
 							Id id = (Id) annotation;
 							if(value != null){
 								dbObject.put(id.name(), type.cast(value));	
@@ -111,6 +111,27 @@ public class MongoDBMapper implements Mapper {
 		return null;
 	}
 	
+	public Object retrieveIdObject(Object document) {
+		Class<?> clazz = document.getClass();
+		if(isMapped(clazz)) {
+			try {
+				Field[] fields = clazz.getDeclaredFields();
+				for (Field field : fields) {
+					field.setAccessible(true);
+					if(field.getAnnotation(Id.class) != null) {
+						Object id = field.get(document);
+						if(id != null) {
+							return id;
+						}
+						throw new CentaurusMappingException("Cannot delete document withod Id field.");
+					}
+				}
+			} catch (Exception e) {
+				throw new CentaurusMappingException(String.format("Cannot retireve Id object from document: %s", document.toString()));
+			}
+		}	
+		throw new CentaurusMappingException(String.format("%s is not mapped", clazz.getName()));
+	}
 	
 	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value) {
 		try {
@@ -137,4 +158,5 @@ public class MongoDBMapper implements Mapper {
 			throw new CentaurusMappingException(String.format("Cannot cast %s value to %s type", value.toString(), type.getName()));
 		}
 	}
+
 }

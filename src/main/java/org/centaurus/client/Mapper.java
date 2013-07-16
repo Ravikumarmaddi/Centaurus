@@ -17,4 +17,6 @@ public interface Mapper {
 	
 	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value);
 	
+	public Object retrieveIdObject(Object document);
+	
 }
