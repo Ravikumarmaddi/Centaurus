@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
 import org.centaurus.client.DBClient;
 import org.centaurus.client.Mapper;
 import org.centaurus.client.QueryProcessor;
@@ -67,7 +66,7 @@ public class MongoDBClient implements DBClient {
 	public <T> void delete(T document) {
 		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document.getClass()));
 		Object id = mapper.retrieveIdObject(document);
-		collection.remove(new BasicDBObject("_id", new ObjectId(id.toString()))); 
+		collection.remove(new BasicDBObject("_id", id)); 
 	}
 
 	public <T> List<T> list(Class<T> document) {

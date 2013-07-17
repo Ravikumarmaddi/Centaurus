@@ -13,4 +13,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Id {
 	public String name() default "_id";
+	public boolean defaultId();
 }
