@@ -2,14 +2,21 @@ package org.centaurus.client.mongodb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.bson.types.ObjectId;
 import org.centaurus.annotations.Array;
 import org.centaurus.annotations.Document;
+import org.centaurus.annotations.Embedded;
 import org.centaurus.annotations.Id;
 import org.centaurus.client.Mapper;
 import org.centaurus.configuration.CentaurusConfig;
@@ -38,21 +45,33 @@ public class MongoDBMapper implements Mapper {
 				String name = field.getName();
 				try {
 					Object value = field.get(document);
-					Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
-					for (Annotation annotation : declaredAnnotations) {
-						if(annotation instanceof org.centaurus.annotations.Field) {
-							org.centaurus.annotations.Field fld = (org.centaurus.annotations.Field) annotation;
-							String fieldAnnotationName = fld.name().equals("") ? name : fld.name(); 
-							dbObject.put(fieldAnnotationName, type.cast(value));
-							break;
-						}else if(annotation instanceof Id) {
-							Id id = (Id) annotation;
-							if(value != null){
-								if(id.defaultId()) { //create basic mongo ObjectId
-									dbObject.put(id.name(), new ObjectId(type.cast(value).toString()));
+					if(value != null) {
+						Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
+						for (Annotation annotation : declaredAnnotations) {
+							String annotName = null;
+							if(annotation instanceof org.centaurus.annotations.Field) {
+								org.centaurus.annotations.Field annot = (org.centaurus.annotations.Field) annotation;
+								annotName = annot.name().equals("") ? name : annot.name(); 
+								dbObject.put(annotName, type.cast(value));
+								break;
+							} else if(annotation instanceof Id) {
+								Id annot = (Id) annotation;
+								if(annot.defaultId()) { //create basic mongo ObjectId
+									dbObject.put(annot.name(), new ObjectId(type.cast(value).toString()));
 								} else { 
-									dbObject.put(id.name(), type.cast(value));		
+									dbObject.put(annot.name(), type.cast(value));		
 								}
+								break;
+							} else if(annotation instanceof Array) {
+								Array annot = (Array) annotation;
+								annotName = annot.name().equals("") ? name : annot.name();
+								dbObject.put(annotName, value);
+								break;
+							} else if(annotation instanceof Embedded) {
+								Embedded annot = (Embedded) annotation;
+								annotName = annot.name().equals("") ? name : annot.name();
+								dbObject.put(annotName, documentToDBObject(value));
+								break;
 							}
 						}
 					}
@@ -80,21 +99,36 @@ public class MongoDBMapper implements Mapper {
 						Class<?> type = field.getType();
 						Annotation[] annotations = field.getAnnotations();
 						for (Annotation annotation : annotations) {
+							String annotName = null;
 							if(annotation instanceof org.centaurus.annotations.Field) {
 								org.centaurus.annotations.Field annot = (org.centaurus.annotations.Field) annotation;
-								if(annot.name().equals(key)){
-									field.set(bean, parseDBTypesToJavaTypes(type, dbObj.get(key)));	
-								}
-							} else if (annotation instanceof Id) {
-								Id annot = (Id) annotation;
-								if(annot.name().equals(key)){
-									field.set(bean, parseDBTypesToJavaTypes(type, dbObj.get(key)));	
-								}
-							} else if(annotation instanceof Array) {
-								Array annot = (Array) annotation;			
-								if(annot.name().equals(key)) {
+								annotName = annot.name().equals("") ? field.getName() : annot.name();
+								if(annotName.equals(key)){
 									field.set(bean, parseDBTypesToJavaTypes(type, dbObj.get(key)));
 								}
+								break;
+							} else if(annotation instanceof Id) {
+								Id annot = (Id) annotation;
+								annotName = annot.name().equals("") ? field.getName() : annot.name();
+								if(annotName.equals(key)){
+									field.set(bean, parseDBTypesToJavaTypes(type, dbObj.get(key)));	
+								}
+								break;
+							} else if(annotation instanceof Array) {
+								Array annot = (Array) annotation;
+								annotName = annot.name().equals("") ? field.getName() : annot.name();
+								if(annotName.equals(key)) {
+									field.set(bean, parseDBTypesToJavaTypes(type, dbObj.get(key)));
+								}
+								break;
+							} else if(annotation instanceof Embedded) {
+								Embedded annot = (Embedded) annotation;
+								annotName = annot.name().equals("") ? field.getName() : annot.name();
+								if(annotName.equals(key)) {
+									Object embeddedObject = dbObjectToDocument(type, dbObj.get(key));
+									field.set(bean, type.cast(embeddedObject));
+								}
+								break;
 							}
 						}
 					}
@@ -137,7 +171,7 @@ public class MongoDBMapper implements Mapper {
 						if(id != null) {
 							return annotation.defaultId() == true ? new ObjectId(id.toString()) : id;
 						}
-						throw new CentaurusMappingException("Cannot delete document withod Id field.");
+						throw new CentaurusMappingException("Cannot delete document withod Id field specified.");
 					}
 				}
 			} catch (Exception e) {
@@ -166,12 +200,30 @@ public class MongoDBMapper implements Mapper {
 				SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.ROOT);
 				return type.cast(formatter.parse(value.toString()));
 			} else if(Collection.class.isAssignableFrom(type)) {
-				BasicDBList collection = (BasicDBList) value;				
-				return type.cast(collection);
+				BasicDBList collection = (BasicDBList) value;
+				//TODO cannot get collection generic type
+				Class<?> componentType = type.getComponentType();
+				if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
+					return type.cast(collection);	
+				} else {
+					List<T> list = new ArrayList<T>();
+					for (int i = 0; i < collection.size(); i++) {
+						list.add((T) dbObjectToDocument(componentType, collection.get(i)));
+					}
+					return (T) list;
+				}
 			} else if(type.isArray()) {
 				BasicDBList array = (BasicDBList) value;
 				Class<?> componentType = type.getComponentType();
-				return type.cast(array.toArray((T[]) java.lang.reflect.Array.newInstance(componentType, 1)));
+				if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
+					return type.cast(array.toArray((T[]) java.lang.reflect.Array.newInstance(componentType, 1)));
+				} else {
+					T[] arr = (T[]) java.lang.reflect.Array.newInstance(componentType, array.size());
+					for (int i = 0; i < array.size(); i++) {
+						arr[i] = (T) dbObjectToDocument(componentType, array.get(i));
+					}
+					return (T) arr;
+				}
 			}
 			else {
 				return type.cast(value.toString());
