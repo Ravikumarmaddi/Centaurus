@@ -2,13 +2,10 @@ package org.centaurus.client.mongodb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -65,7 +62,7 @@ public class MongoDBMapper implements Mapper {
 							} else if(annotation instanceof Array) {
 								Array annot = (Array) annotation;
 								annotName = annot.name().equals("") ? name : annot.name();
-								dbObject.put(annotName, value);
+								dbObject.put(annotName, documentListToDBList(value));
 								break;
 							} else if(annotation instanceof Embedded) {
 								Embedded annot = (Embedded) annotation;
@@ -118,7 +115,7 @@ public class MongoDBMapper implements Mapper {
 								Array annot = (Array) annotation;
 								annotName = annot.name().equals("") ? field.getName() : annot.name();
 								if(annotName.equals(key)) {
-									field.set(bean, parseDBTypesToJavaTypes(type, dbObj.get(key)));
+									field.set(bean, dbObjectListToDocumentList(type, dbObj.get(key), field));
 								}
 								break;
 							} else if(annotation instanceof Embedded) {
@@ -181,7 +178,6 @@ public class MongoDBMapper implements Mapper {
 		throw new CentaurusMappingException(String.format("%s is not mapped", clazz.getName()));
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value) {
 		try {
 			if(type.equals(Integer.class)){
@@ -199,38 +195,69 @@ public class MongoDBMapper implements Mapper {
 			} else if(type.equals(Date.class)) {
 				SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.ROOT);
 				return type.cast(formatter.parse(value.toString()));
-			} else if(Collection.class.isAssignableFrom(type)) {
-				BasicDBList collection = (BasicDBList) value;
-				//TODO cannot get collection generic type
-				Class<?> componentType = type.getComponentType();
-				if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
-					return type.cast(collection);	
-				} else {
-					List<T> list = new ArrayList<T>();
-					for (int i = 0; i < collection.size(); i++) {
-						list.add((T) dbObjectToDocument(componentType, collection.get(i)));
-					}
-					return (T) list;
-				}
-			} else if(type.isArray()) {
-				BasicDBList array = (BasicDBList) value;
-				Class<?> componentType = type.getComponentType();
-				if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
-					return type.cast(array.toArray((T[]) java.lang.reflect.Array.newInstance(componentType, 1)));
-				} else {
-					T[] arr = (T[]) java.lang.reflect.Array.newInstance(componentType, array.size());
-					for (int i = 0; i < array.size(); i++) {
-						arr[i] = (T) dbObjectToDocument(componentType, array.get(i));
-					}
-					return (T) arr;
-				}
-			}
-			else {
+			} else {
 				return type.cast(value.toString());
 			}	
 		} catch (Exception e) {
 			throw new CentaurusMappingException(String.format("Cannot cast %s value to %s type", value.toString(), type.getName()));
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T documentListToDBList(Object documentList) {
+		Class<? extends Object> clazz = documentList.getClass();
+		BasicDBList basicDBList = new BasicDBList();
 
+		List<Object> iterableList = clazz.isArray() ? Arrays.asList((Object[]) documentList) : (List<Object>) documentList;
+
+		if(iterableList != null && !iterableList.isEmpty()){
+			Class<?> componentType = iterableList.get(0).getClass();
+			
+			for (Object document : iterableList) {
+				if (componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)) {
+					basicDBList.add(document);
+				} else {
+					basicDBList.add(documentToDBObject(document));
+				}
+			}
+		}
+			
+		return (T) (basicDBList.size() == 0 ? null : basicDBList);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field) {
+		BasicDBList dbList = (BasicDBList) dbObjectList;
+		Class<?> componentType = null;
+				
+		if(type.isArray()){
+			componentType = type.getComponentType();
+			if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
+				return type.cast(dbList.toArray((T[]) java.lang.reflect.Array.newInstance(componentType, 1)));
+			} else {
+				T[] arr = (T[]) java.lang.reflect.Array.newInstance(componentType, dbList.size());
+				for (int i = 0; i < dbList.size(); i++) {
+					arr[i] = (T) dbObjectToDocument(componentType, dbList.get(i));
+				}
+				return (T) arr;
+			}
+		} else {
+			ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+			if(parameterizedType == null){
+				componentType = type.getComponentType();	
+			} else {
+				componentType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+			}
+			if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
+				return type.cast(dbList);	
+			} else {
+				List<T> list = new ArrayList<T>();
+				for (int i = 0; i < dbList.size(); i++) {
+					list.add((T) dbObjectToDocument(componentType, dbList.get(i)));
+				}
+				return (T) list;
+			}
+		}
+	}
+	
 }

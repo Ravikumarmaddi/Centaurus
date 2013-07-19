@@ -1,5 +1,6 @@
 package org.centaurus.client;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,8 @@ public interface Mapper {
 	
 	@SuppressWarnings("unchecked")
 	public static final Set<Class<?>> WRAPPER_TYPES = new HashSet<Class<?>>(Arrays.asList(
-		    Boolean.class, Character.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class));
+							    Boolean.class, Character.class, Byte.class, Short.class, Integer.class, 
+							    Long.class, Float.class, Double.class, Void.class, String.class));
 	
 	public <T> T documentToDBObject(Object document);
 	
@@ -26,5 +28,9 @@ public interface Mapper {
 	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value);
 	
 	public Object retrieveIdObject(Object document);
+	
+	public <T> T documentListToDBList(Object documentList);
+	
+	public <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field);
 	
 }
