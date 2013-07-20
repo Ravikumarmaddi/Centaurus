@@ -19,6 +19,8 @@ public interface Query<T> {
 	public Query<T> limit(Number limit);
 
 	public Query<T> sort(String field, Sorting sorting);
+	
+	public Query<T> project(Projection... projection);
 
 	public List<T> list();
 

@@ -13,6 +13,7 @@ public abstract class QueryData {
 	private Number offset;
 	private Number limit;
 	private SortOption sortOption;
+	private List<Projection> projectionList;
 	
 	public List<Expression> getExpressionList() {
 		if (expressionList == null) {
@@ -49,9 +50,20 @@ public abstract class QueryData {
 		this.sortOption = sortOption;
 	}
 
+	public List<Projection> getProjectionList() {
+		if(projectionList == null){
+			projectionList = new ArrayList<Projection>();
+		}
+		return projectionList;
+	}
+
+	public void setProjectionList(List<Projection> projectionList) {
+		this.projectionList = projectionList;
+	}
+	
 	public boolean hasFilterOptions(){
-		if(getExpressionList().size() != 0 || getOffset() != null 
-				 || getLimit() != null || getSortOption() != null){
+		if(getExpressionList().size() != 0 || getOffset() != null || getLimit() != null 
+				|| getSortOption() != null || getProjectionList().size() != 0){
 			return true;
 		}
 		return false;
@@ -62,6 +74,7 @@ public abstract class QueryData {
 		setOffset(null);
 		setLimit(null);
 		setSortOption(null);
+		getProjectionList().clear();
 	}
 
 	@Override
@@ -75,6 +88,8 @@ public abstract class QueryData {
 		builder.append(limit);
 		builder.append(", sortOption=");
 		builder.append(sortOption);
+		builder.append(", projectionList=");
+		builder.append(projectionList);
 		builder.append("]");
 		return builder.toString();
 	}

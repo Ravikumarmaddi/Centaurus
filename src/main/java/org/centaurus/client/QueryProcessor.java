@@ -15,5 +15,7 @@ public interface QueryProcessor<T> {
 	public Number processLimitClause(QueryData queryData);
 
 	public T processSortClause(QueryData queryData);
+	
+	public T processProjectionClause(QueryData queryData);
 
 }

@@ -4,24 +4,23 @@ package org.centaurus.enums;
  * 
  * @author Vladislav Socolov
  */
-public enum Sorting {
+public enum ProjectionType {
 	/**
-	 * Sort in ascending order.
+	 * Include field in projection.
 	 */
-	ASC(1),
+	INCLUDE(1),
 	/**
-	 * Sort in descending order.
+	 * Exclude field from projection.
 	 */
-	DESC(-1);
+	EXCLUDE(0);
 	
 	private int value;
 	
-	private Sorting(int value){
+	ProjectionType(int value){
 		this.value = value;
 	}
 
 	public int getValue() {
 		return value;
 	}
-	
 }

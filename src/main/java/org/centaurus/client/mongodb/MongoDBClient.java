@@ -159,9 +159,14 @@ public class MongoDBClient implements DBClient {
 		DBCollection collection = mongoDB.getCollection(mapper.getCollectionName(document));
 		DBCursor cursor = collection.find();
 		
-		if(!queryData.getExpressionList().isEmpty()){
+		if(!queryData.getExpressionList().isEmpty() && !queryData.getProjectionList().isEmpty()){
+			cursor = collection.find(queryProcessor.processWhereClause(queryData), queryProcessor.processProjectionClause(queryData));
+		} else if(!queryData.getExpressionList().isEmpty() && queryData.getProjectionList().isEmpty()){
 			cursor = collection.find(queryProcessor.processWhereClause(queryData));
+		} else if(queryData.getExpressionList().isEmpty() && !queryData.getProjectionList().isEmpty()){
+			cursor = collection.find(null, queryProcessor.processProjectionClause(queryData));
 		}
+		
 		if(queryData.getOffset() != null){
 			cursor.skip(queryData.getOffset().intValue());
 		}

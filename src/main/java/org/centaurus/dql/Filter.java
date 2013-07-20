@@ -9,8 +9,12 @@ import org.centaurus.enums.Operator;
  * 
  * @author Vladislav Socolov
  */
-public class Filter {
+public final class Filter {
 
+	private Filter(){
+		super();
+	}
+	
 	public static Expression eq(String field, Object value) {
 		return new Expression(field, value, Operator.eq);
 	}

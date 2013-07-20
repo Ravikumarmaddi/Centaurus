@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.centaurus.client.QueryProcessor;
 import org.centaurus.dql.Expression;
+import org.centaurus.dql.Projection;
 import org.centaurus.dql.QueryData;
 import org.centaurus.enums.Junction;
 import org.centaurus.enums.Operator;
@@ -49,7 +50,15 @@ public class MongoDBQueryProcessor<T extends DBObject> implements QueryProcessor
 	public T processSortClause(QueryData queryData) {
 		return (T) new BasicDBObject(queryData.getSortOption().getField(), queryData.getSortOption().getSorting().getValue());	
 	}
-
+	
+	public T processProjectionClause(QueryData queryData) {
+		BasicDBObject dbObject = new BasicDBObject();
+		for (Projection projection : queryData.getProjectionList()) {
+			dbObject.append(projection.getField(), projection.getProjectionType().getValue());
+		}
+		return (T) dbObject;
+	}
+	
 	private T processNestedLogicalOperators(Expression expression){
 		Junction junction = expression.getJunction();
 		List<T> nestedFilters = new ArrayList<T>();
@@ -70,4 +79,5 @@ public class MongoDBQueryProcessor<T extends DBObject> implements QueryProcessor
 		}
 		return (T) QueryBuilder.start().or(nestedFilters.toArray(new BasicDBObject[0])).get();
 	}
+	
 }

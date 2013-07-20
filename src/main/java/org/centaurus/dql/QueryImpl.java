@@ -45,6 +45,11 @@ public class QueryImpl<T> extends QueryData implements Query<T> {
 		return this;
 	}
 
+	public Query<T> project(Projection... projection) {
+		getProjectionList().addAll(Arrays.asList(projection));
+		return this;
+	}
+	
 	public List<T> list() {
 		List<T> list = null;
 		if(hasFilterOptions()){
