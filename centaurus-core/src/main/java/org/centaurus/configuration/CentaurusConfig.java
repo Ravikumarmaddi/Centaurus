@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.centaurus.annotations.ConfigProperty;
-import org.centaurus.enums.DBType;
-import org.centaurus.exceptions.CentaurusException;
 
 /**
  * 
@@ -23,8 +21,8 @@ public class CentaurusConfig implements Serializable {
 	private List<String> packageMappingList;
 	
 	//DB connection proprietes
-	@ConfigProperty(name = "connection.db_type")
-	private String dbType;
+	@ConfigProperty(name = "connection.client")
+	private String client;
 	@ConfigProperty(name = "connection.host")
 	private String  dbHost;
 	@ConfigProperty(name = "connection.db")
@@ -73,20 +71,12 @@ public class CentaurusConfig implements Serializable {
 		this.packageMappingList = packageMappingList;
 	}
 
-	public String getDbType() {
-		return dbType;
-	}
-
-	public DBType getDbTypeEnum() {
-		try {
-			return DBType.valueOf(dbType);
-		} catch (Exception e) {
-			throw new CentaurusException("Cannot find or bad format db_type property in centaurus.cfg.xml");
-		}
+	public String getClient() {
+		return client;
 	}
 	
-	public void setDbType(String dbType) {
-		this.dbType = dbType;
+	public void setClientDriver(String client) {
+		this.client = client;
 	}
 
 	public String getDbHost() {
@@ -149,8 +139,8 @@ public class CentaurusConfig implements Serializable {
 		builder.append(classMappingList);
 		builder.append(", packageMappingList=");
 		builder.append(packageMappingList);
-		builder.append(", dbType=");
-		builder.append(dbType);
+		builder.append(", client=");
+		builder.append(client);
 		builder.append(", dbHost=");
 		builder.append(dbHost);
 		builder.append(", dbName=");
