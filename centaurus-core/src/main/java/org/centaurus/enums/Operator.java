@@ -40,5 +40,9 @@ public enum Operator {
 	/**
 	 * Matches values that do not exist in an array specified to the query.
 	 */
-	nin
+	nin,
+	/**
+	 * Matches all values that match expression.
+	 */
+	like
 }

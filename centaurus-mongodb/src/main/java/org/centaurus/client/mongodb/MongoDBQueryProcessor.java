@@ -2,6 +2,7 @@ package org.centaurus.client.mongodb;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.centaurus.client.QueryProcessor;
 import org.centaurus.dql.Expression;
@@ -30,6 +31,8 @@ public class MongoDBQueryProcessor<T extends DBObject> implements QueryProcessor
 			} else {
 				if(expression.getOperator() == Operator.eq){
 					filters.add((T) new BasicDBObject(expression.getField(), expression.getValue()));
+				} else if (expression.getOperator() == Operator.like) {
+					filters.add((T) new BasicDBObject(expression.getField(), Pattern.compile(expression.getValue().toString().replace("%", ".*"), 2)));
 				} else {
 					filters.add((T) new BasicDBObject(expression.getField(), new BasicDBObject("$" + expression.getOperator().name(), expression.getValue())));
 				}

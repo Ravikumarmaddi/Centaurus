@@ -3,6 +3,7 @@ package org.centaurus.dql;
 import java.util.Arrays;
 
 import org.centaurus.enums.Junction;
+import org.centaurus.enums.MatchPlace;
 import org.centaurus.enums.Operator;
 
 /**
@@ -27,7 +28,7 @@ public final class Filter {
 		return new Expression(field, value, Operator.gt);
 	}
 
-	public static Expression get(String field, Object value) {
+	public static Expression gte(String field, Object value) {
 		return new Expression(field, value, Operator.gte);
 	}
 
@@ -37,6 +38,22 @@ public final class Filter {
 
 	public static Expression lte(String field, Object value) {
 		return new Expression(field, value, Operator.lte);
+	}
+	
+	public static Expression like(String field, Object value, MatchPlace matchPlace) {
+		String endValue = value != null ? value.toString().trim() : "";
+		switch (matchPlace) {
+		case START:
+			endValue = endValue + "%";
+			break;
+		case END:
+			endValue = "%" + endValue;
+			break;
+		default:
+			endValue = "%" + endValue + "%";
+			break;
+		}
+		return new Expression(field, endValue, Operator.like);
 	}
 
 	public static Expression and(Expression... expressions) {
