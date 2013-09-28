@@ -21,6 +21,7 @@ import org.scannotation.AnnotationDB;
 public class Scanner extends ScannerTemplate{
 	private static Logger log = Logger.getLogger(Scanner.class);
 	private static final String TARGET_PREFIX = "target/classes/";
+	private static final String TEST_TARGET_PREFIX = "target/test-classes/";
 	
 	private ConfigurationFileParser fileParser;
 	
@@ -35,7 +36,7 @@ public class Scanner extends ScannerTemplate{
 	}
 
 	@Override
-	protected void scanPackages() throws ConfigurationException{  
+	protected void scanPackages() {  
 		AnnotationDB db = new AnnotationDB();
 		Set<URL> urlPaths = new HashSet<URL>();
 
@@ -44,36 +45,41 @@ public class Scanner extends ScannerTemplate{
 		if(CentaurusConfig.getInstance().getPackageMappingList() != null){
 			for (String path : CentaurusConfig.getInstance().getPackageMappingList()) {
 				String pathString = TARGET_PREFIX.concat(path).replace('.', '/');
+				String testPathString = TEST_TARGET_PREFIX.concat(path).replace('.', '/');
 				try {
 					urlPaths.add(new File(pathString).toURI().toURL());
+					urlPaths.add(new File(testPathString).toURI().toURL());
 				} catch (MalformedURLException e) {
 					log.error(String.format("Cannot cast mapping package path:(%s) to file URL.", pathString));
 				}
 			}	
 		}
 		
-		String className = null;
-		try {
-			db.scanArchives((URL[])urlPaths.toArray(new URL[0]));
-			if(db.getAnnotationIndex().get(Document.class.getName()) != null){
-				String[] entityClasses = (String[]) db.getAnnotationIndex().get(Document.class.getName()).toArray(new String[0]);
-				for(int i = 0; i < entityClasses.length; i++) {
-					try{
-						className = entityClasses[i];
-						if(!CentaurusConfig.getInstance().getMappedClasses().contains(className)){
-							Class<?> clazz = Class.forName(className);
-							CentaurusConfig.getInstance().getMappedClasses().add(clazz);
-							log.info(String.format("Scanned %s class.", className));
+		URL[] urls = (URL[])urlPaths.toArray(new URL[1]);
+		for (URL url : urls) {
+			try {
+				db.scanArchives(url);
+				if(db.getAnnotationIndex().get(Document.class.getName()) != null){
+					String[] entityClasses = (String[]) db.getAnnotationIndex().get(Document.class.getName()).toArray(new String[0]);
+					for(int i = 0; i < entityClasses.length; i++) {
+						String className = null;
+						try{
+							className = entityClasses[i];
+							if(!CentaurusConfig.getInstance().getMappedClasses().contains(className)){
+								Class<?> clazz = Class.forName(className);
+								CentaurusConfig.getInstance().getMappedClasses().add(clazz);
+								log.info(String.format("Scanned %s class.", className));
+							}
+						} catch (ClassNotFoundException e) {
+							log.error(String.format("Cannot extract class type of name: %s", className));
 						}
-					} catch (ClassNotFoundException e) {
-						log.error(String.format("Cannot extract class type of name: %s", className));
 					}
 				}
-			}
-			
-		} catch (IOException e) {
-			throw new ConfigurationException("Cannot scan mapping packages in project classpath.", e);
-		} 
+				
+			} catch (IOException e) {
+				log.error(String.format("Cannot scan package: %s", url.toString()));
+			} 
+		}
 	}
 	
 	@Override
