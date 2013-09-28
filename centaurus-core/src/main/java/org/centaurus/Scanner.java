@@ -39,6 +39,7 @@ public class Scanner extends ScannerTemplate{
 		AnnotationDB db = new AnnotationDB();
 		Set<URL> urlPaths = new HashSet<URL>();
 
+		
 		log.info("Scanner step 2: Scanning configuration packages.");
 		if(CentaurusConfig.getInstance().getPackageMappingList() != null){
 			for (String path : CentaurusConfig.getInstance().getPackageMappingList()) {
