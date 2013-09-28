@@ -10,6 +10,7 @@
 	</properties>
 	
 	<mapping class="org.centaurus.client.mongodb.test.model.Student" />
+    <mapping class="org.centaurus.client.mongodb.test.model.EmbeddedStudent" />
 	
-	<mapping package="org.centaurus.client.mongodb.test.model" />
+<!--	<mapping package="org.centaurus.client.mongodb.test.model" />    -->
 </centaurus-configuration>
