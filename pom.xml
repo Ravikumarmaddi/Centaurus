@@ -28,9 +28,14 @@
 				<version>2.11.1</version>
 			</dependency>
 			<dependency>
-				<groupId>net.sf.scannotation</groupId>
-				<artifactId>scannotation</artifactId>
-				<version>1.0.2</version>
+				<groupId>easymock</groupId>
+				<artifactId>easymock</artifactId>
+				<version>2.0</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
