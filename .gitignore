@@ -11,6 +11,7 @@ target
 *.orig
 *.com
 *.class
+*.iml
 
 # Package Files #
 *.jar
