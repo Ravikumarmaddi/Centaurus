@@ -8,6 +8,7 @@
 	<modules>
 		<module>centaurus-core</module>
 		<module>centaurus-mongodb</module>
+		<module>centaurus-couchdb</module>
 	</modules>
 
 	<dependencyManagement>
