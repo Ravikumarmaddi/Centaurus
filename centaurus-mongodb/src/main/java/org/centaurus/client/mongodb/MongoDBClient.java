@@ -129,8 +129,7 @@ public class MongoDBClient implements DBClient {
 	}
 	
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 
 	public void close() {

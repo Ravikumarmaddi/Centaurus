@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<centaurus-configuration>
+	<properties>
+		<property name="connection.client">org.centaurus.client.couchdb.CouchDBClient</property>
+		<property name="connection.host">127.0.0.1</property>
+		<property name="connection.port">5984</property>
+		<property name="connection.db">learning</property>
+	</properties>
+	
+	<mapping class="org.centaurus.client.couchdb.test.model.Student" />
+</centaurus-configuration>

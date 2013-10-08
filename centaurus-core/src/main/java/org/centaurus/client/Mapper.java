@@ -5,32 +5,45 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.centaurus.annotations.Document;
+import org.centaurus.configuration.CentaurusConfig;
+
 
 /**
  * 
  * @author Vladislav Socolov
  */
-public interface Mapper {
+public abstract class Mapper {
 	
 	@SuppressWarnings("unchecked")
 	public static final Set<Class<?>> WRAPPER_TYPES = new HashSet<Class<?>>(Arrays.asList(
 							    Boolean.class, Character.class, Byte.class, Short.class, Integer.class, 
 							    Long.class, Float.class, Double.class, Void.class, String.class));
 	
-	public <T> T documentToDBObject(Object document);
+	public abstract <T> T documentToDBObject(Object document);
 	
-	public <T> T dbObjectToDocument(Class<T> document, Object dbObject);
+	public abstract <T> T dbObjectToDocument(Class<T> document, Object dbObject);
 	
-	public boolean isMapped(Class<?> clazz);
+	public abstract <T> T parseDBTypesToJavaTypes(Class<T> type, Object value);
 	
-	public String getCollectionName(Class<?> clazz);
+	public abstract Object retrieveIdObject(Object document);
 	
-	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value);
+	public abstract <T> T documentListToDBList(Object documentList);
 	
-	public Object retrieveIdObject(Object document);
+	public abstract <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field);
 	
-	public <T> T documentListToDBList(Object documentList);
+	public String getCollectionName(Class<?> clazz) {
+		if(isMapped(clazz)) {
+			Document annotation = clazz.getAnnotation(Document.class);
+			return annotation.collection().equals("") ? clazz.getSimpleName() : annotation.collection();
+		}	
+		return null;
+	}
 	
-	public <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field);
-	
+	public boolean isMapped(Class<?> clazz) {
+		if(CentaurusConfig.getInstance().getMappedClasses().contains(clazz)){
+			return true;
+		}
+		return false;
+	}
 }

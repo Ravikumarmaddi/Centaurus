@@ -12,11 +12,9 @@ import java.util.Locale;
 
 import org.bson.types.ObjectId;
 import org.centaurus.annotations.Array;
-import org.centaurus.annotations.Document;
 import org.centaurus.annotations.Embedded;
 import org.centaurus.annotations.Id;
 import org.centaurus.client.Mapper;
-import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.exceptions.CentaurusMappingException;
 
 import com.mongodb.BasicDBList;
@@ -28,7 +26,7 @@ import com.mongodb.DBObject;
  * 
  * @author Vladislav Socolov
  */
-public class MongoDBMapper implements Mapper {
+public class MongoDBMapper extends Mapper {
 	
 	@SuppressWarnings("unchecked")
 	public <T> T documentToDBObject(Object document) {
@@ -138,21 +136,6 @@ public class MongoDBMapper implements Mapper {
 		} else {
 			throw new CentaurusMappingException(String.format("%s is not mapped", document.getName()));
 		}
-	}
-
-	public boolean isMapped(Class<?> clazz) {
-		if(CentaurusConfig.getInstance().getMappedClasses().contains(clazz)){
-			return true;
-		}
-		return false;
-	}
-
-	public String getCollectionName(Class<?> clazz) {
-		if(isMapped(clazz)) {
-			Document annotation = clazz.getAnnotation(Document.class);
-			return annotation.collection().equals("") ? clazz.getSimpleName() : annotation.collection();
-		}	
-		return null;
 	}
 	
 	public Object retrieveIdObject(Object document) {
