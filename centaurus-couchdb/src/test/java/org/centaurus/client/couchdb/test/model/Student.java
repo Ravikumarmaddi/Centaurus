@@ -1,6 +1,7 @@
 package org.centaurus.client.couchdb.test.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.centaurus.annotations.Document;
 import org.centaurus.annotations.Field;
@@ -17,6 +18,8 @@ public class Student implements Serializable {
 	private Integer age;
 	@Field(name = "name")
 	private String name;
+	@Field(name = "created")
+	private Date created;
 	
 	public Student() {
 		super();
@@ -31,6 +34,13 @@ public class Student implements Serializable {
 		this.id = id;
 		this.age = age;
 		this.name = name;
+	}
+	
+	public Student(String id, Integer age, String name, Date created) {
+		this.id = id;
+		this.age = age;
+		this.name = name;
+		this.created = created;
 	}
 	
 	public String getId() {
@@ -56,6 +66,14 @@ public class Student implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
 
 	@Override
 	public String toString() {
@@ -66,6 +84,8 @@ public class Student implements Serializable {
 		builder.append(age);
 		builder.append(", name=");
 		builder.append(name);
+		builder.append(", created=");
+		builder.append(created);
 		builder.append("]");
 		return builder.toString();
 	}
