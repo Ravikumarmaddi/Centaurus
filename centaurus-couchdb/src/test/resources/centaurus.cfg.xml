@@ -8,4 +8,5 @@
 	</properties>
 	
 	<mapping class="org.centaurus.client.couchdb.test.model.Student" />
+	<mapping class="org.centaurus.client.couchdb.test.model.EmbeddedStudent" />
 </centaurus-configuration>

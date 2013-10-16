@@ -60,7 +60,7 @@ public class MongoDBMapper extends Mapper {
 							} else if(annotation instanceof Array) {
 								Array annot = (Array) annotation;
 								annotName = annot.name().equals("") ? name : annot.name();
-								dbObject.put(annotName, documentListToDBList(value));
+								dbObject.put(annotName, documentListToDBList(DBObject.class, value));
 								break;
 							} else if(annotation instanceof Embedded) {
 								Embedded annot = (Embedded) annotation;
@@ -162,11 +162,11 @@ public class MongoDBMapper extends Mapper {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T documentListToDBList(Object documentList) {
-		Class<? extends Object> clazz = documentList.getClass();
+	public <T> T documentListToDBList(Class<T> returnedType, Object documentList) {
+		Class<? extends Object> documentListClazz = documentList.getClass();
 		BasicDBList basicDBList = new BasicDBList();
 
-		List<Object> iterableList = clazz.isArray() ? Arrays.asList((Object[]) documentList) : (List<Object>) documentList;
+		List<Object> iterableList = documentListClazz.isArray() ? Arrays.asList((Object[]) documentList) : (List<Object>) documentList;
 
 		if(iterableList != null && !iterableList.isEmpty()){
 			Class<?> componentType = iterableList.get(0).getClass();

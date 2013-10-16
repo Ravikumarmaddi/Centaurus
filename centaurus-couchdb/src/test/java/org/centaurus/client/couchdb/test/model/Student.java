@@ -1,9 +1,12 @@
 package org.centaurus.client.couchdb.test.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
+import org.centaurus.annotations.Array;
 import org.centaurus.annotations.Document;
+import org.centaurus.annotations.Embedded;
 import org.centaurus.annotations.Field;
 import org.centaurus.annotations.Id;
 
@@ -20,6 +23,10 @@ public class Student implements Serializable {
 	private String name;
 	@Field(name = "created")
 	private Date created;
+	@Array(name = "courses")
+	private String[] courses;
+	@Embedded(name  = "embedded")
+	private EmbeddedStudent embeddedStudent;
 	
 	public Student() {
 		super();
@@ -41,6 +48,23 @@ public class Student implements Serializable {
 		this.age = age;
 		this.name = name;
 		this.created = created;
+	}
+	
+	public Student(String id, Integer age, String name, Date created, String[] courses) {
+		this.id = id;
+		this.age = age;
+		this.name = name;
+		this.created = created;
+		this.courses = courses;
+	}
+	
+	public Student(String id, Integer age, String name, Date created, String[] courses, EmbeddedStudent embeddedStudent) {
+		this.id = id;
+		this.age = age;
+		this.name = name;
+		this.created = created;
+		this.courses = courses;
+		this.embeddedStudent = embeddedStudent;
 	}
 	
 	public String getId() {
@@ -75,6 +99,22 @@ public class Student implements Serializable {
 		this.created = created;
 	}
 
+	public String[] getCourses() {
+		return courses;
+	}
+
+	public void setCourses(String[] courses) {
+		this.courses = courses;
+	}
+	
+	public EmbeddedStudent getEmbeddedStudent() {
+		return embeddedStudent;
+	}
+
+	public void setEmbeddedStudent(EmbeddedStudent embeddedStudent) {
+		this.embeddedStudent = embeddedStudent;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -86,8 +126,11 @@ public class Student implements Serializable {
 		builder.append(name);
 		builder.append(", created=");
 		builder.append(created);
+		builder.append(", courses=");
+		builder.append(Arrays.toString(courses));
+		builder.append(", embeddedStudent=");
+		builder.append(embeddedStudent);
 		builder.append("]");
 		return builder.toString();
 	}
-	
 }

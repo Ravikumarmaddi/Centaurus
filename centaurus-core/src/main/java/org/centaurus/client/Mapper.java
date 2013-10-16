@@ -28,7 +28,7 @@ public abstract class Mapper {
 	
 	public abstract Object retrieveIdObject(Object document);
 	
-	public abstract <T> T documentListToDBList(Object documentList);
+	public abstract <T> T documentListToDBList(Class<T> returnedType, Object documentList);
 	
 	public abstract <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field);
 	

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.centaurus.Session;
 import org.centaurus.SessionFactory;
+import org.centaurus.client.couchdb.test.model.EmbeddedStudent;
 import org.centaurus.client.couchdb.test.model.Student;
 import org.centaurus.dql.Query;
 import org.junit.Assert;
@@ -24,7 +25,7 @@ public class QueryTest {
 	
 	@Test
 	public void insert_should_insert_successfuly_new_user(){
-		Student student = new Student("TestId", 99, "Test", new Date());
+		Student student = new Student("TestId", 99, "Test", new Date(), new String[]{"English", "Math"}, new EmbeddedStudent(11, 11, 2011));
 		session.insert(student);
 		Assert.assertNotNull(student);
 	}
