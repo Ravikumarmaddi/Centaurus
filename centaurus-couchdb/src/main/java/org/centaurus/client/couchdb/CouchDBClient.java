@@ -35,18 +35,24 @@ public class CouchDBClient implements DBClient {
 	}
 
 	public <T> T insertOrUpdate(T document) {
-		// TODO Auto-generated method stub
-		return null;
+		JsonObject dbObject = mapper.documentToDBObject(document);
+		if(dbObject.get("_id") != null){
+			couchClient.save(dbObject);
+		} else {
+			couchClient.update(dbObject);
+		}
+		return document;
 	}
 
 	public <T> T update(T document) {
-		// TODO Auto-generated method stub
-		return null;
+		JsonObject dbObject = mapper.documentToDBObject(document);
+		couchClient.update(dbObject);
+		return document;
 	}
 
 	public <T> void delete(T document) {
-		// TODO Auto-generated method stub
-
+		JsonObject dbObject = mapper.documentToDBObject(document);
+		couchClient.remove(dbObject);
 	}
 
 	public <T> List<T> list(Class<T> document) {

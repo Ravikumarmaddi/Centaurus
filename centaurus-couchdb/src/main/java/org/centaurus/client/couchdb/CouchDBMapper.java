@@ -112,8 +112,26 @@ public class CouchDBMapper extends Mapper {
 	}
 
 	public Object retrieveIdObject(Object document) {
-		// TODO Auto-generated method stub
-		return null;
+		Class<?> clazz = document.getClass();
+		if(isMapped(clazz)) {
+			try {
+				Field[] fields = clazz.getDeclaredFields();
+				for (Field field : fields) {
+					field.setAccessible(true);
+					Id annotation = field.getAnnotation(Id.class);
+					if(annotation != null) {
+						Object id = field.get(document);
+						if(id != null) {
+							return id;
+						}
+						throw new CentaurusMappingException("Cannot retrieve id from object. Id is null.");
+					}
+				}
+			} catch (Exception e) {
+				throw new CentaurusMappingException(String.format("Cannot retireve Id object from document: %s", document.toString()));
+			}
+		}	
+		throw new CentaurusMappingException(String.format("%s is not mapped", clazz.getName()));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -151,7 +151,7 @@ public class MongoDBMapper extends Mapper {
 						if(id != null) {
 							return annotation.defaultId() == true ? new ObjectId(id.toString()) : id;
 						}
-						throw new CentaurusMappingException("Cannot delete document withod Id field specified.");
+						throw new CentaurusMappingException("Cannot retrieve id from object. Id is null.");
 					}
 				}
 			} catch (Exception e) {

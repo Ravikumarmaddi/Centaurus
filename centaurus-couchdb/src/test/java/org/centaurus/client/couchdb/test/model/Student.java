@@ -15,8 +15,10 @@ public class Student implements Serializable {
 
 	private static final long serialVersionUID = -5266511816374301596L;
 	
-	@Id(defaultId = true)
+	@Id(defaultId = false)
 	private String id;
+	@Field(name = "_rev")
+	private String rev;
 	@Field(name = "age")
 	private Integer age;
 	@Field(name = "name")
@@ -39,6 +41,13 @@ public class Student implements Serializable {
 
 	public Student(String id, Integer age, String name) {
 		this.id = id;
+		this.age = age;
+		this.name = name;
+	}
+	
+	public Student(String id, String rev, Integer age, String name) {
+		this.id = id;
+		this.rev = rev;
 		this.age = age;
 		this.name = name;
 	}
@@ -75,6 +84,14 @@ public class Student implements Serializable {
 		this.id = id;
 	}
 
+	public String getRev() {
+		return rev;
+	}
+
+	public void setRev(String rev) {
+		this.rev = rev;
+	}
+	
 	public Integer getAge() {
 		return age;
 	}
@@ -133,4 +150,5 @@ public class Student implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
+	
 }

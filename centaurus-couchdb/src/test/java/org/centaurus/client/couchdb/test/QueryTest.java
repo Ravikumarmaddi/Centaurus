@@ -26,7 +26,20 @@ public class QueryTest {
 	@Test
 	public void insert_should_insert_successfuly_new_user(){
 		Student student = new Student("TestId", 99, "Test", new Date(), new String[]{"English", "Math"}, new EmbeddedStudent(11, 11, 2011));
-		session.insert(student);
-		Assert.assertNotNull(student);
+		Student newStudent = session.insert(student);
+		Assert.assertNotNull(newStudent);
+	}
+	
+	//@Test
+	public void update_should_update_successfuly_user(){
+		Student student = new Student("TestId","1-b6d0c491777bcae12d6e4881844bdb4c", 999, "Testic");
+		Student newStudent = session.update(student);
+		Assert.assertNotNull(newStudent);
+	}
+	
+	//@Test
+	public void delete_should_delete_successfuly_user(){
+		Student student = new Student("TestId","1-4a4a9f7b06b7f8616c5b80ad7e3e07ad", 999, "Testic");
+		session.delete(student);
 	}
 }
