@@ -101,14 +101,58 @@ public class CouchDBMapper extends Mapper {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T dbObjectToDocument(Class<T> document, Object dbObject) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if(isMapped(document)){
+			try {
+				Object bean = document.getConstructor().newInstance();
+				JsonObject dbObj = (JsonObject) dbObject;
+				JsonObject value = (JsonElement) dbObj.get("id") != null ? (JsonObject) dbObj.get("value") : (JsonObject) dbObject;
+				
+				Field[] fields = document.getDeclaredFields();
+				for (Field field : fields) {
+					field.setAccessible(true);
+					Class<?> type = field.getType();
+					Annotation[] annotations = field.getAnnotations();
+					for (Annotation annotation : annotations) {
+						String annotName = null;
+						if(annotation instanceof org.centaurus.annotations.Field) {
+							org.centaurus.annotations.Field annot = (org.centaurus.annotations.Field) annotation;
+							annotName = annot.name().equals("") ? field.getName() : annot.name();
+							JsonElement jsonElement = value.get(annotName);
+							if(jsonElement != null){
+								field.set(bean, parseDBTypesToJavaTypes(type, jsonElement));
+							}
+							break;
+						} else if(annotation instanceof Id) {
+							Id annot = (Id) annotation;
+							annotName = annot.name().equals("") ? field.getName() : annot.name();
+							JsonElement jsonElement = value.get(annotName);
+							if(jsonElement != null){
+								field.set(bean, parseDBTypesToJavaTypes(type, jsonElement));
+							}
+							break;
+						} else if(annotation instanceof Embedded) {
+							Embedded annot = (Embedded) annotation;
+							annotName = annot.name().equals("") ? field.getName() : annot.name();
+							JsonElement jsonElement = value.get(annotName);
+							if(jsonElement != null) {
+								Object embeddedObject = dbObjectToDocument(type, jsonElement);
+								field.set(bean, type.cast(embeddedObject));
+							}
+							break;
+						} 
 
-	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value) {
-		// TODO Auto-generated method stub
-		return null;
+					}
+				}
+				
+				return (T) bean;
+			} catch (Throwable e) {
+				throw new CentaurusMappingException("Cannot map dbObject to real object", e);
+			}
+		} else {
+			throw new CentaurusMappingException(String.format("%s is not mapped", document.getName()));
+		}
 	}
 
 	public Object retrieveIdObject(Object document) {
@@ -160,6 +204,31 @@ public class CouchDBMapper extends Mapper {
 		return null;
 	}
 
+	public <T> T parseDBTypesToJavaTypes(Class<T> type, Object value) {
+		try {
+			if(type.equals(Integer.class)){
+				return type.cast(((Double)Double.parseDouble(value.toString())).intValue());
+			} else if(type.equals(Long.class)){
+				return type.cast(((Double)Double.parseDouble(value.toString())).longValue());
+			} else if (type.equals(Byte.class)) {
+				return type.cast(((Double)Double.parseDouble(value.toString())).byteValue());
+			} else if (type.equals(Double.class)) {
+				return type.cast(Double.parseDouble(value.toString()));
+			} else if (type.equals(Float.class)) {
+				return type.cast(((Double)Double.parseDouble(value.toString())).floatValue());
+			} else if (type.equals(Boolean.class)) {
+				return type.cast(Boolean.parseBoolean(value.toString()));
+			} else if(type.equals(Date.class)) {
+				SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.ROOT);
+				return type.cast(formatter.parse(((JsonElement)value).getAsString()));
+			} else {
+				return type.cast(value.toString());
+			}	
+		} catch (Exception e) {
+			throw new CentaurusMappingException(String.format("Cannot cast %s value to %s type", value.toString(), type.getName()));
+		}
+	}
+	
 	public <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field) {
 		// TODO Auto-generated method stub
 		return null;

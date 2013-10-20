@@ -24,13 +24,13 @@ public abstract class Mapper {
 	
 	public abstract <T> T dbObjectToDocument(Class<T> document, Object dbObject);
 	
-	public abstract <T> T parseDBTypesToJavaTypes(Class<T> type, Object value);
-	
 	public abstract Object retrieveIdObject(Object document);
 	
 	public abstract <T> T documentListToDBList(Class<T> returnedType, Object documentList);
 	
 	public abstract <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field);
+	
+	public abstract <T> T parseDBTypesToJavaTypes(Class<T> type, Object value);
 	
 	public String getCollectionName(Class<?> clazz) {
 		if(isMapped(clazz)) {

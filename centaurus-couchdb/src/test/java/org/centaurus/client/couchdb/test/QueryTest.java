@@ -1,6 +1,7 @@
 package org.centaurus.client.couchdb.test;
 
 import java.util.Date;
+import java.util.List;
 
 import org.centaurus.Session;
 import org.centaurus.SessionFactory;
@@ -23,7 +24,7 @@ public class QueryTest {
 		Assert.assertNotNull(query);
 	}
 	
-	@Test
+	//@Test
 	public void insert_should_insert_successfuly_new_user(){
 		Student student = new Student("TestId", 99, "Test", new Date(), new String[]{"English", "Math"}, new EmbeddedStudent(11, 11, 2011));
 		Student newStudent = session.insert(student);
@@ -41,5 +42,11 @@ public class QueryTest {
 	public void delete_should_delete_successfuly_user(){
 		Student student = new Student("TestId","1-4a4a9f7b06b7f8616c5b80ad7e3e07ad", 999, "Testic");
 		session.delete(student);
+	}
+	
+	@Test
+	public void list_should_return_not_empty_list(){
+		List<?> list = query.list();
+		Assert.assertEquals(false, list.isEmpty());
 	}
 }

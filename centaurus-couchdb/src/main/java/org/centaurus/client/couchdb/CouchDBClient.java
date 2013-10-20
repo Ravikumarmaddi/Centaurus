@@ -1,5 +1,6 @@
 package org.centaurus.client.couchdb;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -9,6 +10,7 @@ import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.dql.QueryData;
 import org.centaurus.exceptions.CentaurusException;
 import org.lightcouch.CouchDbClient;
+import org.lightcouch.DesignDocument.MapReduce;
 
 import com.google.gson.JsonObject;
 
@@ -56,8 +58,22 @@ public class CouchDBClient implements DBClient {
 	}
 
 	public <T> List<T> list(Class<T> document) {
-		// TODO Auto-generated method stub
-		return null;
+		List<T> list = new ArrayList<T>();	
+		String collectionName = mapper.getCollectionName(document);
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("function(doc) {");
+		builder.append(String.format("if(doc.collection_name == '%s') {", collectionName));
+		builder.append("emit(doc._id, doc); } }");
+		
+		MapReduce mapReduce = new MapReduce();
+		mapReduce.setMap(builder.toString());
+		
+		List<JsonObject> query = couchClient.view("_temp_view").tempView(mapReduce).query(JsonObject.class);
+		for (JsonObject dbObject : query) {
+			list.add(document.cast(mapper.dbObjectToDocument(document, dbObject)));
+		}		
+		return list;
 	}
 
 	public <T> List<T> list(Class<T> document, QueryData queryData) {
