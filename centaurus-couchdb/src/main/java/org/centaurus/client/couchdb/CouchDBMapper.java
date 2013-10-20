@@ -2,7 +2,9 @@ package org.centaurus.client.couchdb;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -141,8 +143,15 @@ public class CouchDBMapper extends Mapper {
 								field.set(bean, type.cast(embeddedObject));
 							}
 							break;
+						} else if(annotation instanceof Array) {
+							Array annot = (Array) annotation;
+							annotName = annot.name().equals("") ? field.getName() : annot.name();
+							JsonElement jsonElement = value.get(annotName);
+							if(jsonElement != null) {
+								field.set(bean, dbObjectListToDocumentList(type, jsonElement, field));
+							}
+							break;
 						} 
-
 					}
 				}
 				
@@ -229,9 +238,41 @@ public class CouchDBMapper extends Mapper {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> T dbObjectListToDocumentList(Class<T> type, Object dbObjectList, Field field) {
-		// TODO Auto-generated method stub
-		return null;
+		JsonArray dbList = (JsonArray) dbObjectList;
+		Class<?> componentType = null;
+		Gson gson = new Gson();
+		
+		if(type.isArray()){
+			componentType = type.getComponentType();
+			if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
+				return type.cast(gson.fromJson(dbList, type));
+			} else {
+				T[] arr = (T[]) java.lang.reflect.Array.newInstance(componentType, dbList.size());
+				for (int i = 0; i < dbList.size(); i++) {
+					arr[i] = (T) dbObjectToDocument(componentType, dbList.get(i));
+				}
+				return (T) arr;
+			}
+		} else {
+			ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+			if(parameterizedType == null){
+				componentType = type.getComponentType();	
+			} else {
+				componentType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+			}
+			
+			if(componentType.isPrimitive() || WRAPPER_TYPES.contains(componentType)){
+				return type.cast(gson.fromJson(dbList, type));	
+			} else {
+				List<T> list = new ArrayList<T>();
+				for (int i = 0; i < dbList.size(); i++) {
+					list.add((T) dbObjectToDocument(componentType, dbList.get(i)));
+				}
+				return (T) list;
+			}
+		}
 	}
 
 }
