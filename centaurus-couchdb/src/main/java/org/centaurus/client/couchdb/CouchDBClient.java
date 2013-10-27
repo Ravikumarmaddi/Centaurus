@@ -59,15 +59,9 @@ public class CouchDBClient implements DBClient {
 
 	public <T> List<T> list(Class<T> document) {
 		List<T> list = new ArrayList<T>();	
-		String collectionName = mapper.getCollectionName(document);
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append("function(doc) {");
-		builder.append(String.format("if(doc.collection_name == '%s') {", collectionName));
-		builder.append("emit(doc._id, doc); } }");
 		
 		MapReduce mapReduce = new MapReduce();
-		mapReduce.setMap(builder.toString());
+		mapReduce.setMap(baseTemporaryViewQuery(document).toString());
 		
 		List<JsonObject> query = couchClient.view("_temp_view").tempView(mapReduce).query(JsonObject.class);
 		for (JsonObject dbObject : query) {
@@ -82,8 +76,11 @@ public class CouchDBClient implements DBClient {
 	}
 
 	public <T> T first(Class<T> document) {
-		// TODO Auto-generated method stub
-		return null;
+		MapReduce mapReduce = new MapReduce();
+		mapReduce.setMap(baseTemporaryViewQuery(document).toString());
+		
+		List<JsonObject> query = couchClient.view("_temp_view").tempView(mapReduce).query(JsonObject.class);		
+		return document.cast(mapper.dbObjectToDocument(document, query.get(0)));
 	}
 
 	public <T> T first(Class<T> document, QueryData queryData) {
@@ -92,8 +89,11 @@ public class CouchDBClient implements DBClient {
 	}
 
 	public <T> T last(Class<T> document) {
-		// TODO Auto-generated method stub
-		return null;
+		MapReduce mapReduce = new MapReduce();
+		mapReduce.setMap(baseTemporaryViewQuery(document).toString());
+		
+		List<JsonObject> query = couchClient.view("_temp_view").tempView(mapReduce).descending(true).query(JsonObject.class);		
+		return document.cast(mapper.dbObjectToDocument(document, query.get(0)));
 	}
 
 	public <T> T last(Class<T> document, QueryData queryData) {
@@ -102,8 +102,13 @@ public class CouchDBClient implements DBClient {
 	}
 
 	public Number count(Class<?> document) {
-		// TODO Auto-generated method stub
-		return null;
+		MapReduce mapReduce = new MapReduce();
+		mapReduce.setMap(baseTemporaryViewQuery(document).toString());
+		mapReduce.setReduce("_count");
+		
+		List<JsonObject> query = couchClient.view("_temp_view").tempView(mapReduce).query(JsonObject.class);
+		JsonObject jsonObject = query.get(0);
+		return jsonObject.get("value").getAsInt();
 	}
 
 	public Number count(Class<?> document, QueryData queryData) {
@@ -134,6 +139,17 @@ public class CouchDBClient implements DBClient {
 			log.error(String.format("Cannot connect to %s:%d %s", host, port, dbName));
 			throw new CentaurusException(String.format("Cannot connect to %s:%d %s", host, port, dbName), e);
 		}
+	}
+	
+	private StringBuilder baseTemporaryViewQuery(Class<?> document){
+		String collectionName = mapper.getCollectionName(document);
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append("function(doc) {");
+		builder.append(String.format("if(doc.collection_name == '%s') {", collectionName));
+		builder.append("emit(doc._id, doc); } }");
+		
+		return builder;
 	}
 
 }

@@ -49,4 +49,22 @@ public class QueryTest {
 		List<?> list = query.list();
 		Assert.assertEquals(false, list.isEmpty());
 	}
+	
+	@Test
+	public void first_should_not_be_null(){
+		Student first = (Student) query.first();
+		Assert.assertNotNull(first);
+	}
+	
+	@Test
+	public void last_should_not_be_null(){
+		Student last = (Student) query.last();
+		Assert.assertNotNull(last);
+	}
+	
+	@Test
+	public void count_should_not_be_null(){
+		Number count = query.count();
+		Assert.assertNotNull(count);
+	}
 }
