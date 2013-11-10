@@ -9,6 +9,7 @@ import org.centaurus.client.couchdb.test.model.EmbeddedStudent;
 import org.centaurus.client.couchdb.test.model.Student;
 import org.centaurus.dql.Filter;
 import org.centaurus.dql.Query;
+import org.centaurus.enums.Sorting;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,4 +79,25 @@ public class QueryTest {
 															)).list();
 		Assert.assertEquals(false, list.isEmpty());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void wherelimit_should_not_return_empty_list(){
+		List<Student> list = (List<Student>) query.where(Filter.gt("age", 10)).limit(1).list();
+		Assert.assertEquals(1, list.size());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void sort_should_not_return_empty_list(){
+		List<Student> list = (List<Student>) query.where(Filter.gt("age", 10)).sort("age", Sorting.DESC).list();
+		Assert.assertEquals(4, list.size());
+	}
+	
+	@Test
+	public void count_should_not_return_4(){
+		Number count = query.where(Filter.gt("age", 23)).count();
+		Assert.assertEquals(2, count.intValue());
+	}
+	
 }
