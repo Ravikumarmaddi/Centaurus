@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.centaurus.client.DBClient;
 import org.centaurus.client.Mapper;
+import org.centaurus.client.QueryProcessor;
 import org.centaurus.configuration.CentaurusConfig;
 import org.centaurus.dql.QueryData;
 import org.centaurus.exceptions.CentaurusException;
@@ -24,9 +25,11 @@ public class CouchDBClient implements DBClient {
 
 	private CouchDbClient couchClient;
 	private Mapper mapper;
+	private QueryProcessor<String> queryProcessor;
 
 	public CouchDBClient() {
 		mapper = new CouchDBMapper();
+		queryProcessor = new  CouchDBQueryProcessor<String>();
 		fetchClientProprietes();
 	}
 
@@ -70,9 +73,14 @@ public class CouchDBClient implements DBClient {
 		return list;
 	}
 
-	public <T> List<T> list(Class<T> document, QueryData queryData) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> List<T> list(Class<T> document, QueryData queryData) { //---------------------------------------------
+		List<T> list = new ArrayList<T>();	
+		
+		List<JsonObject> query = processQueryClauses(document, queryData);
+		for (JsonObject dbObject : query) {
+			list.add(document.cast(mapper.dbObjectToDocument(document, dbObject)));
+		}		
+		return list;
 	}
 
 	public <T> T first(Class<T> document) {
@@ -152,4 +160,37 @@ public class CouchDBClient implements DBClient {
 		return builder;
 	}
 
+	private List<JsonObject> processQueryClauses(Class<?> document, QueryData queryData){
+		String collectionName = mapper.getCollectionName(document);		
+		StringBuilder builder = new StringBuilder();
+		builder.append("function(doc) {");
+		builder.append(String.format("if(doc.collection_name == '%s') {", collectionName));
+		
+		if(!queryData.getExpressionList().isEmpty() && !queryData.getProjectionList().isEmpty()){
+			//TODO not implemented yet
+		} else if(!queryData.getExpressionList().isEmpty() && queryData.getProjectionList().isEmpty()){
+			builder.append(queryProcessor.processWhereClause(queryData)).append("{");
+			builder.append("emit(doc._id, doc);");
+			builder.append("}}}");
+		} else if(queryData.getExpressionList().isEmpty() && !queryData.getProjectionList().isEmpty()){
+			//TODO not implemented yet
+		}
+		
+		MapReduce mapReduce = new MapReduce();
+		mapReduce.setMap(builder.toString());
+		List<JsonObject> query = couchClient.view("_temp_view").tempView(mapReduce).query(JsonObject.class);
+		
+//		if(queryData.getOffset() != null){
+//			cursor.skip(queryData.getOffset().intValue());
+//		}
+//		if(queryData.getLimit() != null){
+//			cursor.limit(queryData.getLimit().intValue());
+//		}
+//		if(queryData.getSortOption() != null){
+//			cursor.sort(queryProcessor.processSortClause(queryData));
+//		}
+		
+		return query;
+	}
+	
 }

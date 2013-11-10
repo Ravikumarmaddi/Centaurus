@@ -7,6 +7,7 @@ import org.centaurus.Session;
 import org.centaurus.SessionFactory;
 import org.centaurus.client.couchdb.test.model.EmbeddedStudent;
 import org.centaurus.client.couchdb.test.model.Student;
+import org.centaurus.dql.Filter;
 import org.centaurus.dql.Query;
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,5 +67,15 @@ public class QueryTest {
 	public void count_should_not_be_null(){
 		Number count = query.count();
 		Assert.assertNotNull(count);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void where_should_return_not_empty_list(){
+		List<Student> list = (List<Student>) query.where(Filter.or(
+															Filter.and(Filter.eq("age", 23), Filter.eq("name", "Vlad")),
+															Filter.and(Filter.eq("age", 19), Filter.eq("name", "Tina"))
+															)).list();
+		Assert.assertEquals(false, list.isEmpty());
 	}
 }

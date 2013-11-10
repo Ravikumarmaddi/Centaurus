@@ -8,9 +8,20 @@ public enum Junction {
 	/**
 	 * Conjunction
 	 */
-	AND, 
+	AND("&&"), 
 	/**
 	 * Disjunction
 	 */
-	OR
+	OR("||");
+	
+	private String value;
+
+	private Junction(String value) {
+		this.value = value;
+	}
+	
+	public String getValue() {
+		return value;
+	}
+	
 }

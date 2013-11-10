@@ -31,7 +31,7 @@ public class MongoDBClient implements DBClient {
 	private MongoClient mongoClient;
 	private DB mongoDB;
 	private Mapper mapper;
-	QueryProcessor<DBObject> queryProcessor;
+	private QueryProcessor<DBObject> queryProcessor;
 	
 	public MongoDBClient() {
 		this.mapper = new MongoDBMapper();

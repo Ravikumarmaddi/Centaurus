@@ -8,41 +8,52 @@ public enum Operator {
 	/**
 	 * Matches all values that are equal to the value specified in the query.
 	 */
-	eq,
+	eq("=="),
 	/**
 	 * Matches arrays that contain all elements specified in the query.
 	 */
-	all,
+	all(null),
 	/**
 	 * Matches values that are greater than the value specified in the query.
 	 */
-	gt,
+	gt(">"),
 	/**
 	 * Matches values that are equal to or greater than the value specified in the query.
 	 */
-	gte,
+	gte(">="),
 	/**
 	 * Matches any of the values that exist in an array specified in the query.
 	 */
-	in,
+	in(null),
 	/**
 	 * Matches vales that are less than the value specified in the query.
 	 */
-	lt,
+	lt("<"),
 	/**
 	 * Matches values that are less than or equal to the value specified in the query.
 	 */
-	lte,
+	lte("<="),
 	/**
 	 * Matches all values that are not equal to the value specified in the query.
 	 */
-	ne,
+	ne("!="),
 	/**
 	 * Matches values that do not exist in an array specified to the query.
 	 */
-	nin,
+	nin(null),
 	/**
 	 * Matches all values that match expression.
 	 */
-	like
+	like(null);
+	
+	private String value;
+
+	Operator(String value){
+		this.value = value;
+	}
+	
+	public String getValue() {
+		return value;
+	}
+
 }
